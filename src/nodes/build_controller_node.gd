@@ -24,6 +24,11 @@ signal action_performed(action: StringName, succeeded: bool)
 @onready var _session: GameSessionNode = get_node(session_node_path)
 
 
+func configure_geometry(origin: Vector2, size: float) -> void:
+	board_origin = origin
+	cell_size = size
+
+
 func _process(_delta: float) -> void:
 	debug_hovered_cell = mouse_to_cell(get_viewport().get_mouse_position())
 

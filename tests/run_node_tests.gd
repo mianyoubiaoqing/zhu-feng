@@ -24,6 +24,8 @@ func _run() -> void:
 	var audio_director := root.get_node("AudioDirector") as AudioDirector
 	_expect(session != null and build_controller != null and board_view != null and cargo_view != null and audio_director != null, "调试节点全部实例化")
 	_expect(session.is_initialized() and session.debug_phase == "BUILD", "Session节点初始化并暴露建造阶段")
+	_expect(is_equal_approx(board_view.cell_size, cargo_view.cell_size) and board_view.board_origin.is_equal_approx(cargo_view.board_origin), "棋盘与风种共享自适应坐标")
+	_expect(board_view.cell_size >= 88.0 and board_view.cell_size <= 140.0, "六关棋盘尺寸保持在可读范围")
 	_expect(board_view.debug_loaded_art_assets == 34, "BoardView绑定全部34张棋盘图片")
 	_expect(audio_director.debug_loaded_audio_assets == 15, "AudioDirector绑定全部15段音频")
 	_expect((root.get_node("HUD/Sidebar/MoneyIcon") as TextureRect).texture != null, "HUD绑定预算金币图片")
@@ -37,7 +39,9 @@ func _run() -> void:
 		if button_style == null or button_style.texture == null:
 			skinned_buttons = false
 	_expect(skinned_buttons, "施工按钮绑定裁切后的UI美术")
+	_expect((sidebar.get_node("Bend") as Button).button_pressed, "默认装置以持续高亮反馈当前选择")
 	_expect(root.get_node_or_null("HUD/LevelSelect") != null and root.get_node_or_null("HUD/Next") != null, "关卡导航避开施工面板并保持可用")
+	_expect(not (root.get_node("HUD/RuntimeStats") as Label).visible, "发布态默认隐藏运行时调试信息")
 
 	var initial_wind_cells := session.debug_wind_cell_count
 	var placed := session.place_device(GameRules.DeviceKind.BLOCKER, Vector2i(2, 5))
@@ -53,9 +57,13 @@ func _run() -> void:
 		await process_frame
 		animation_frames += 1
 	_expect(not cargo_view.debug_animating and cargo_view.debug_outcome != "PENDING", "CargoView节点完成路线表现并暴露结果")
+	var result_panel := root.get_node("HUD/ResultPanel") as Panel
+	var result_title := root.get_node("HUD/ResultPanel/Title") as Label
+	_expect(result_panel.visible and result_title.text == "风路未接通", "失败结果通过独立结算面板呈现")
 
-	session.return_to_build()
+	root.call("_on_return_to_build")
 	_expect(session.debug_phase == "BUILD", "Session节点返回建造阶段")
+	_expect(not result_panel.visible and sidebar.modulate.is_equal_approx(Color.WHITE), "返回施工时恢复侧栏并收起结算面板")
 	print("节点验证完成：%d checks，%d failures" % [checks, failures])
 	audio_director.stop_all_audio()
 	for _audio_frame in 2:

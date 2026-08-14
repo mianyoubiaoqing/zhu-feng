@@ -41,6 +41,7 @@ extends Node
 @onready var _mechanics_stop_timer: Timer = $MechanicsStopTimer
 @onready var _door_delay_timer: Timer = $DoorDelayTimer
 var _confirm_variant := false
+var _wind_fade: Tween
 
 
 func _ready() -> void:
@@ -62,6 +63,8 @@ func _exit_tree() -> void:
 
 
 func stop_all_audio() -> void:
+	if _wind_fade != null and _wind_fade.is_valid():
+		_wind_fade.kill()
 	for timer in [_ui_stop_timer, _sfx_stop_timer, _mechanics_stop_timer, _door_delay_timer]:
 		timer.stop()
 	for player in [_ui_player, _sfx_player, _mechanics_player, _wind_player]:
@@ -113,15 +116,27 @@ func start_wind() -> void:
 		return
 	if not _wind_player.playing:
 		_wind_player.stream = wind_loop
+		_wind_player.volume_db = -28.0
 		_wind_player.play()
+	if _wind_fade != null and _wind_fade.is_valid():
+		_wind_fade.kill()
+	_wind_fade = create_tween()
+	_wind_fade.tween_property(_wind_player, "volume_db", -7.0, 0.32).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	debug_last_cue = "wind_loop"
 
 
 func stop_wind() -> void:
 	debug_wind_requested = false
 	_door_delay_timer.stop()
-	_wind_player.stop()
-	debug_wind_playing = false
+	if _wind_fade != null and _wind_fade.is_valid():
+		_wind_fade.kill()
+	if debug_playback_suppressed or not _wind_player.playing:
+		_wind_player.stop()
+		debug_wind_playing = false
+		return
+	_wind_fade = create_tween()
+	_wind_fade.tween_property(_wind_player, "volume_db", -28.0, 0.22)
+	_wind_fade.tween_callback(_wind_player.stop)
 
 
 func play_result(result: SimulationResult) -> void:
