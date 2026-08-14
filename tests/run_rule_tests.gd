@@ -11,6 +11,7 @@ func _init() -> void:
 	_test_valve()
 	_test_same_direction_merge()
 	_test_opposite_wind_conflict()
+	_test_goal_conflict_fails()
 	_test_loop_detection()
 	_test_turbine_door_and_cargo()
 	_test_budget_and_undo()
@@ -72,6 +73,18 @@ func _test_opposite_wind_conflict() -> void:
 	var wind := WindSolver.solve(level, {}, {})
 	_expect(wind.is_conflict(Vector2i(2, 1)), "异向风完全抵消")
 	_expect(wind.direction_at(Vector2i(2, 1)) < 0, "冲突格没有有效方向")
+
+
+func _test_goal_conflict_fails() -> void:
+	var level := _level(Vector2i(5, 3))
+	level.goal = Vector2i(2, 1)
+	level.fans = [
+		FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT),
+		FanDefinition.create(Vector2i(4, 1), GameRules.Direction.LEFT),
+	]
+	var wind := WindSolver.solve(level, {}, {})
+	var result := CargoSimulator.simulate(level, wind, 0)
+	_expect(wind.is_conflict(level.goal) and not result.succeeded and result.failure_reason == GameRules.FailureReason.CONFLICT, "终点存在逆风冲突时不能提前通关")
 
 
 func _test_loop_detection() -> void:

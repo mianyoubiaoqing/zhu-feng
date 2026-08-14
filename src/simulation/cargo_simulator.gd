@@ -12,15 +12,14 @@ static func simulate(level: LevelDefinition, wind: WindSolution, spent_budget: i
 	var step_limit: int = maxi(8, level.size.x * level.size.y * 4 + 1)
 
 	for _step in step_limit:
+		if wind.is_conflict(current):
+			return _fail(result, GameRules.FailureReason.CONFLICT, current)
 		if current == level.goal:
 			if _required_power_ready(level, wind):
 				result.succeeded = true
 				result.efficient = spent_budget <= level.efficient_budget
 				return result
 			return _fail(result, GameRules.FailureReason.MISSING_POWER, current)
-
-		if wind.is_conflict(current):
-			return _fail(result, GameRules.FailureReason.CONFLICT, current)
 		var direction := wind.direction_at(current)
 		if direction < 0:
 			return _fail(result, GameRules.FailureReason.NO_WIND, current)

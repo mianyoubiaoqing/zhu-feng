@@ -90,7 +90,7 @@ static func build_dual_supply() -> LevelDefinition:
 
 
 static func build_full_workshop() -> LevelDefinition:
-	var level := _base(&"full_workshop", "风路工坊", "在预算内同时完成绕坑、供能、截流和逆风隔离。", "供能风机不能旋走：用挡风板让它在涡轮后停止；右侧逆风则需要单向风阀。")
+	var level := _base(&"full_workshop", "风路工坊", "让风种抵达终点；供能开门或绕开门都算完成。", "门只封锁所在格。可保留供能路线，也可旋转风机，从终点上方或下方进入。")
 	level.size = Vector2i(11, 6)
 	level.budget = 9
 	level.efficient_budget = 7
@@ -102,10 +102,8 @@ static func build_full_workshop() -> LevelDefinition:
 		FanDefinition.create(Vector2i(10, 4), GameRules.Direction.LEFT),
 	]
 	level.pits = [Vector2i(7, 2), Vector2i(8, 2), Vector2i(9, 2)]
-	level.walls = [Vector2i(4, 3), Vector2i(5, 3)]
 	level.turbines = [TurbineDefinition.create(&"core", Vector2i(3, 4))]
 	level.doors = [DoorDefinition.create(Vector2i(7, 4), &"core")]
-	level.required_turbine_ids = [&"core"]
 	return level
 
 

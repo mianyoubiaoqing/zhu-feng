@@ -90,7 +90,9 @@ func preview() -> WindSolution:
 func start_test() -> SimulationResult:
 	var wind := preview()
 	_phase = GameRules.Phase.RESULT
-	return CargoSimulator.simulate(_level, wind, _spent_budget)
+	var result := CargoSimulator.simulate(_level, wind, _spent_budget)
+	_decorate_result(result, wind)
+	return result
 
 
 func return_to_build() -> void:
@@ -168,3 +170,23 @@ func _push_undo() -> void:
 	})
 	if _undo_stack.size() > 64:
 		_undo_stack.pop_front()
+
+
+func _decorate_result(result: SimulationResult, wind: WindSolution) -> void:
+	result.all_turbines_powered = true
+	for turbine in _level.turbines:
+		if not wind.is_turbine_powered(turbine.id):
+			result.all_turbines_powered = false
+			break
+	for fan in _level.fans:
+		if _fan_directions.get(fan.cell, fan.direction) != fan.direction:
+			result.rotated_fan_count += 1
+	var used_kinds: Dictionary = {}
+	for device: PlacedDevice in _placements.values():
+		used_kinds[device.kind] = true
+	result.device_kind_count = used_kinds.size()
+	for door in _level.doors:
+		if door.cell in result.route:
+			result.traversed_door_count += 1
+		else:
+			result.bypassed_door_count += 1
