@@ -22,6 +22,7 @@ extends Node2D
 @export var destination_finish_texture: Texture2D
 @export var wind_fan_body_texture: Texture2D
 @export var wind_fan_blades_texture: Texture2D
+@export var wind_fan_blades_blue_texture: Texture2D
 @export var turbine_blades_texture: Texture2D
 @export var turbine_unpowered_texture: Texture2D
 @export var turbine_powered_base_texture: Texture2D
@@ -45,6 +46,9 @@ extends Node2D
 @export var guiding_left_texture: Texture2D
 @export var valve_horizontal_texture: Texture2D
 @export var valve_vertical_texture: Texture2D
+@export var blocker_texture: Texture2D
+@export var door_open_texture: Texture2D
+@export var door_closed_texture: Texture2D
 
 @export_category("Feedback Art")
 @export var placement_legal_texture: Texture2D
@@ -246,9 +250,10 @@ func _draw_wall(level: LevelDefinition, cell: Vector2i) -> void:
 
 
 func _draw_fan(cell: Vector2i, direction: int) -> void:
-	if wind_fan_body_texture != null and wind_fan_blades_texture != null:
+	var blades := wind_fan_blades_blue_texture if wind_fan_blades_blue_texture != null else wind_fan_blades_texture
+	if wind_fan_body_texture != null and blades != null:
 		_draw_cell_texture(wind_fan_body_texture, cell, 0.86)
-		_draw_rotated_cell_texture(wind_fan_blades_texture, cell, _fan_spin, 0.72)
+		_draw_rotated_cell_texture(blades, cell, _fan_spin, 0.72)
 		_draw_cell_texture(_direction_texture(direction), cell, 0.46, Color(1, 1, 1, 0.82))
 		return
 	var center := cell_center(cell)
@@ -362,6 +367,9 @@ func _draw_action_feedback() -> void:
 
 
 func _draw_blocker(cell: Vector2i) -> void:
+	if blocker_texture != null:
+		_draw_cell_texture(blocker_texture, cell, 0.76)
+		return
 	var center := cell_center(cell)
 	var scale_factor := cell_size / 96.0
 	var plank_size := Vector2(64, 14) * scale_factor
@@ -376,6 +384,10 @@ func _draw_blocker(cell: Vector2i) -> void:
 
 
 func _draw_door(cell: Vector2i, open: bool) -> void:
+	var texture := door_open_texture if open else door_closed_texture
+	if texture != null:
+		_draw_cell_texture(texture, cell, 0.78)
+		return
 	var center := cell_center(cell)
 	var scale_factor := cell_size / 96.0
 	var post_size := Vector2(11, 70) * scale_factor
@@ -475,12 +487,13 @@ func _count_loaded_art_assets() -> int:
 	var assets: Array[Texture2D] = [
 		ground_texture_1, ground_texture_2, abyss_texture, wall_corner_texture, wall_straight_texture,
 		wind_origin_texture, destination_texture, destination_finish_texture,
-		wind_fan_body_texture, wind_fan_blades_texture,
+		wind_fan_body_texture, wind_fan_blades_texture, wind_fan_blades_blue_texture,
 		turbine_blades_texture, turbine_unpowered_texture, turbine_powered_base_texture, turbine_powered_texture,
 		direction_up_texture, direction_right_texture, direction_down_texture, direction_left_texture,
 		conflict_texture, closed_loop_texture, track_straight_texture, track_bend_texture, track_arrow_texture,
 		guiding_up_texture, guiding_right_texture, guiding_down_texture, guiding_left_texture,
-		valve_horizontal_texture, valve_vertical_texture,
+		valve_horizontal_texture, valve_vertical_texture, blocker_texture,
+		door_open_texture, door_closed_texture,
 		placement_legal_texture, placement_illegal_texture,
 		failure_collision_texture, failure_fall_texture, failure_stop_texture,
 	]

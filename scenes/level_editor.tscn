@@ -1,7 +1,10 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/level_editor.gd" id="1_editor"]
 [ext_resource type="Script" path="res://src/editor/level_editor_board.gd" id="2_board"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_body.png" id="3_fan_body"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_blades_blue.png" id="4_fan_blue"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/door_closed.png" id="5_door_closed"]
 
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(0.984, 0.969, 0.894, 0.96)
@@ -124,6 +127,9 @@ color = Color(0.161, 0.565, 0.506, 1)
 
 [node name="EditorBoard" type="Node2D" parent="."]
 script = ExtResource("2_board")
+wind_fan_body_texture = ExtResource("3_fan_body")
+wind_fan_blades_texture = ExtResource("4_fan_blue")
+door_closed_texture = ExtResource("5_door_closed")
 
 [node name="BoardInput" type="Control" parent="."]
 layout_mode = 0

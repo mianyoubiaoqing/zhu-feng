@@ -26,7 +26,8 @@ func _run() -> void:
 	_expect(session.is_initialized() and session.debug_phase == "BUILD", "Session节点初始化并暴露建造阶段")
 	_expect(is_equal_approx(board_view.cell_size, cargo_view.cell_size) and board_view.board_origin.is_equal_approx(cargo_view.board_origin), "棋盘与风种共享自适应坐标")
 	_expect(board_view.cell_size >= 88.0 and board_view.cell_size <= 140.0, "六关棋盘尺寸保持在可读范围")
-	_expect(board_view.debug_loaded_art_assets == 34, "BoardView绑定全部34张棋盘图片")
+	_expect(board_view.debug_loaded_art_assets == 38, "BoardView绑定新增风机、挡风板和门状态图片")
+	_expect(cargo_view.debug_loaded_art_assets == 1, "CargoView绑定风种图片")
 	_expect(audio_director.debug_loaded_audio_assets == 15, "AudioDirector绑定全部15段音频")
 	_expect((root.get_node("HUD/Sidebar/MoneyIcon") as TextureRect).texture != null, "HUD绑定预算金币图片")
 	var sidebar := root.get_node("HUD/Sidebar") as Panel

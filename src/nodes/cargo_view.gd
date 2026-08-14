@@ -8,6 +8,7 @@ signal animation_finished(result: SimulationResult)
 @export var cell_size := 96.0
 @export_range(0.05, 1.0, 0.05) var step_duration := 0.30
 @export var cargo_radius := 18.0
+@export var cargo_texture: Texture2D
 
 @export_category("Runtime Debug (read only)")
 @export var debug_animating := false
@@ -15,6 +16,7 @@ signal animation_finished(result: SimulationResult)
 @export var debug_route_index := 0
 @export var debug_step_progress := 0.0
 @export var debug_logical_cell := Vector2i(-1, -1)
+@export var debug_loaded_art_assets := 0
 @export_multiline var debug_outcome := ""
 
 var _result: SimulationResult
@@ -24,6 +26,8 @@ var _motion_direction := Vector2.RIGHT
 
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	debug_loaded_art_assets = 1 if cargo_texture != null else 0
 	queue_redraw()
 
 
@@ -109,6 +113,13 @@ func _draw() -> void:
 		var tail_radius := cargo_radius * (0.42 - float(index) * 0.09)
 		draw_circle(tail_direction * distance, tail_radius, Color(0.22, 0.78, 0.82, 0.34 - float(index) * 0.08))
 	draw_circle(Vector2.ZERO, cargo_radius * (1.35 + pulse * 0.08), Color(0.98, 0.73, 0.24, 0.14 + pulse * 0.08))
+	if cargo_texture != null:
+		var rotation := _motion_direction.angle() - PI / 4.0
+		var art_size := Vector2.ONE * cell_size * (0.58 + pulse * 0.025)
+		draw_set_transform(Vector2.ZERO, rotation)
+		draw_texture_rect(cargo_texture, Rect2(-art_size * 0.5, art_size), false)
+		draw_set_transform(Vector2.ZERO, 0.0)
+		return
 	draw_circle(Vector2.ZERO, cargo_radius, Color("f6a33b"))
 	draw_circle(Vector2.ZERO, cargo_radius, Color("795238"), false, maxf(2.0, cell_size * 0.026))
 	draw_circle(Vector2(-cargo_radius * 0.18, -cargo_radius * 0.22), cargo_radius * 0.36, Color("ffe4a3"))

@@ -83,7 +83,7 @@ func _process(_delta: float) -> void:
 		session.debug_conflict_count,
 		session.debug_loop_cell_count,
 		cargo_view.debug_route_index,
-		board_view.debug_loaded_art_assets + 7,
+		board_view.debug_loaded_art_assets + cargo_view.debug_loaded_art_assets + 7,
 		audio_director.debug_loaded_audio_assets,
 	]
 
