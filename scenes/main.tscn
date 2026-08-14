@@ -1,0 +1,308 @@
+[gd_scene load_steps=57 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/game_root.gd" id="1_root"]
+[ext_resource type="Script" path="res://src/nodes/game_session_node.gd" id="2_session"]
+[ext_resource type="Script" path="res://src/nodes/build_controller_node.gd" id="3_build"]
+[ext_resource type="Script" path="res://src/nodes/board_view.gd" id="4_board"]
+[ext_resource type="Script" path="res://src/nodes/cargo_view.gd" id="5_cargo"]
+[ext_resource type="Script" path="res://src/nodes/audio_director.gd" id="6_audio_script"]
+[ext_resource type="Texture2D" path="res://assets/art/terrain/ground_1.png" id="10_ground1"]
+[ext_resource type="Texture2D" path="res://assets/art/terrain/ground_2.png" id="11_ground2"]
+[ext_resource type="Texture2D" path="res://assets/art/terrain/abyss.png" id="12_abyss"]
+[ext_resource type="Texture2D" path="res://assets/art/terrain/wall_corner.png" id="13_wall_corner"]
+[ext_resource type="Texture2D" path="res://assets/art/terrain/wall_straight.png" id="14_wall_straight"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_origin.png" id="15_origin"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/destination.png" id="16_destination"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/destination_finish.png" id="17_destination_finish"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_body.png" id="18_fan_body"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_blades.png" id="19_fan_blades"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/direction_up.png" id="20_up"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/direction_right.png" id="21_right"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/direction_down.png" id="22_down"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/direction_left.png" id="23_left"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/conflict.png" id="24_conflict"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/closed_loop.png" id="25_loop"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/placement_legal.png" id="26_legal"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/placement_illegal.png" id="27_illegal"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/failure_collision.png" id="28_fail_collision"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/failure_fall.png" id="29_fail_fall"]
+[ext_resource type="Texture2D" path="res://assets/art/feedback/failure_stop.png" id="30_fail_stop"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/money.png" id="31_money"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/confirm_01.wav" id="40_confirm1"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/confirm_02.wav" id="41_confirm2"]
+[ext_resource type="AudioStream" path="res://assets/audio/build/place_valid.wav" id="42_place_valid"]
+[ext_resource type="AudioStream" path="res://assets/audio/build/place_invalid.wav" id="43_place_invalid"]
+[ext_resource type="AudioStream" path="res://assets/audio/build/rotate.wav" id="44_rotate"]
+[ext_resource type="AudioStream" path="res://assets/audio/build/remove_refund.wav" id="45_remove"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/wind_loop.wav" id="46_wind"]
+[ext_resource type="AudioStream" path="res://assets/audio/mechanics/turbine_start.wav" id="47_turbine"]
+[ext_resource type="AudioStream" path="res://assets/audio/mechanics/door_open.wav" id="48_door"]
+[ext_resource type="AudioStream" path="res://assets/audio/failure/collision.wav" id="49_audio_collision"]
+[ext_resource type="AudioStream" path="res://assets/audio/failure/stall.wav" id="50_audio_stall"]
+[ext_resource type="AudioStream" path="res://assets/audio/failure/fall.wav" id="51_audio_fall"]
+[ext_resource type="AudioStream" path="res://assets/audio/success/normal.wav" id="52_success_normal"]
+[ext_resource type="AudioStream" path="res://assets/audio/success/efficient.wav" id="53_success_efficient"]
+[ext_resource type="AudioStream" path="res://assets/audio/success/finale_material.wav" id="54_finale"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/guiding_up.png" id="60_guiding_up"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/guiding_right.png" id="61_guiding_right"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/guiding_down.png" id="62_guiding_down"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/guiding_left.png" id="63_guiding_left"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/track_straight.png" id="64_track_straight"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/track_bend.png" id="65_track_bend"]
+[ext_resource type="Texture2D" path="res://assets/art/wind/track_arrow.png" id="66_track_arrow"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/turbine_blades.png" id="67_turbine_blades"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/turbine_unpowered.png" id="68_turbine_unpowered"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/turbine_powered_base.png" id="69_turbine_powered_base"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/turbine_powered.png" id="70_turbine_powered"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/valve_horizontal.png" id="71_valve_horizontal"]
+[ext_resource type="Texture2D" path="res://assets/art/devices/valve_vertical.png" id="72_valve_vertical"]
+
+[node name="GameRoot" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0.933, 0.949, 0.945, 1)
+
+[node name="Session" type="Node" parent="."]
+script = ExtResource("2_session")
+
+[node name="BuildController" type="Node" parent="."]
+script = ExtResource("3_build")
+
+[node name="BoardView" type="Node2D" parent="."]
+script = ExtResource("4_board")
+ground_texture_1 = ExtResource("10_ground1")
+ground_texture_2 = ExtResource("11_ground2")
+abyss_texture = ExtResource("12_abyss")
+wall_corner_texture = ExtResource("13_wall_corner")
+wall_straight_texture = ExtResource("14_wall_straight")
+wind_origin_texture = ExtResource("15_origin")
+destination_texture = ExtResource("16_destination")
+destination_finish_texture = ExtResource("17_destination_finish")
+wind_fan_body_texture = ExtResource("18_fan_body")
+wind_fan_blades_texture = ExtResource("19_fan_blades")
+turbine_blades_texture = ExtResource("67_turbine_blades")
+turbine_unpowered_texture = ExtResource("68_turbine_unpowered")
+turbine_powered_base_texture = ExtResource("69_turbine_powered_base")
+turbine_powered_texture = ExtResource("70_turbine_powered")
+direction_up_texture = ExtResource("20_up")
+direction_right_texture = ExtResource("21_right")
+direction_down_texture = ExtResource("22_down")
+direction_left_texture = ExtResource("23_left")
+conflict_texture = ExtResource("24_conflict")
+closed_loop_texture = ExtResource("25_loop")
+track_straight_texture = ExtResource("64_track_straight")
+track_bend_texture = ExtResource("65_track_bend")
+track_arrow_texture = ExtResource("66_track_arrow")
+guiding_up_texture = ExtResource("60_guiding_up")
+guiding_right_texture = ExtResource("61_guiding_right")
+guiding_down_texture = ExtResource("62_guiding_down")
+guiding_left_texture = ExtResource("63_guiding_left")
+valve_horizontal_texture = ExtResource("71_valve_horizontal")
+valve_vertical_texture = ExtResource("72_valve_vertical")
+placement_legal_texture = ExtResource("26_legal")
+placement_illegal_texture = ExtResource("27_illegal")
+failure_collision_texture = ExtResource("28_fail_collision")
+failure_fall_texture = ExtResource("29_fail_fall")
+failure_stop_texture = ExtResource("30_fail_stop")
+
+[node name="CargoView" type="Node2D" parent="."]
+script = ExtResource("5_cargo")
+
+[node name="AudioDirector" type="Node" parent="."]
+script = ExtResource("6_audio_script")
+confirm_01 = ExtResource("40_confirm1")
+confirm_02 = ExtResource("41_confirm2")
+place_valid = ExtResource("42_place_valid")
+place_invalid = ExtResource("43_place_invalid")
+rotate = ExtResource("44_rotate")
+remove_refund = ExtResource("45_remove")
+wind_loop = ExtResource("46_wind")
+turbine_start = ExtResource("47_turbine")
+door_open = ExtResource("48_door")
+failure_collision = ExtResource("49_audio_collision")
+failure_stall = ExtResource("50_audio_stall")
+failure_fall = ExtResource("51_audio_fall")
+success_normal = ExtResource("52_success_normal")
+success_efficient = ExtResource("53_success_efficient")
+finale_material = ExtResource("54_finale")
+
+[node name="UI" type="AudioStreamPlayer" parent="AudioDirector"]
+bus = &"UI"
+
+[node name="SFX" type="AudioStreamPlayer" parent="AudioDirector"]
+bus = &"SFX"
+
+[node name="Mechanics" type="AudioStreamPlayer" parent="AudioDirector"]
+bus = &"SFX"
+
+[node name="Wind" type="AudioStreamPlayer" parent="AudioDirector"]
+bus = &"Ambience"
+
+[node name="UIStopTimer" type="Timer" parent="AudioDirector"]
+one_shot = true
+
+[node name="SFXStopTimer" type="Timer" parent="AudioDirector"]
+one_shot = true
+
+[node name="MechanicsStopTimer" type="Timer" parent="AudioDirector"]
+one_shot = true
+
+[node name="DoorDelayTimer" type="Timer" parent="AudioDirector"]
+one_shot = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="HUD"]
+offset_left = 40.0
+offset_top = 34.0
+offset_right = 650.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 34
+text = "筑风 · 资产接入灰盒"
+
+[node name="Subtitle" type="Label" parent="HUD"]
+offset_left = 40.0
+offset_top = 90.0
+offset_right = 760.0
+offset_bottom = 125.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 19
+text = "运行后切换到 Remote 场景树，可逐节点查看美术、音频与规则状态"
+
+[node name="Sidebar" type="Panel" parent="HUD"]
+offset_left = 24.0
+offset_top = 150.0
+offset_right = 350.0
+offset_bottom = 800.0
+
+[node name="Heading" type="Label" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 18.0
+offset_right = 290.0
+offset_bottom = 54.0
+theme_override_font_sizes/font_size = 24
+text = "施工装置"
+
+[node name="Bend" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 72.0
+offset_right = 310.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 19
+text = "导风板 · 2 金币"
+
+[node name="Blocker" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 146.0
+offset_right = 310.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 19
+text = "挡风板 · 1 金币"
+
+[node name="Valve" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 220.0
+offset_right = 310.0
+offset_bottom = 280.0
+theme_override_font_sizes/font_size = 19
+text = "单向风阀 · 2 金币"
+
+[node name="MoneyIcon" type="TextureRect" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 306.0
+offset_right = 66.0
+offset_bottom = 356.0
+mouse_filter = 2
+texture = ExtResource("31_money")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Budget" type="Label" parent="HUD/Sidebar"]
+offset_left = 76.0
+offset_top = 306.0
+offset_right = 310.0
+offset_bottom = 390.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 18
+text = "施工 0 / 10\n精简目标 ≤ 7\n当前装置：导风板"
+
+[node name="Undo" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 414.0
+offset_right = 152.0
+offset_bottom = 468.0
+theme_override_font_sizes/font_size = 17
+text = "撤销"
+
+[node name="Start" type="Button" parent="HUD/Sidebar"]
+offset_left = 174.0
+offset_top = 414.0
+offset_right = 310.0
+offset_bottom = 468.0
+theme_override_font_sizes/font_size = 17
+text = "启动测试"
+
+[node name="Build" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 484.0
+offset_right = 152.0
+offset_bottom = 538.0
+theme_override_font_sizes/font_size = 17
+text = "返回建造"
+
+[node name="Retry" type="Button" parent="HUD/Sidebar"]
+offset_left = 174.0
+offset_top = 484.0
+offset_right = 310.0
+offset_bottom = 538.0
+theme_override_font_sizes/font_size = 17
+text = "重新测试"
+
+[node name="LevelSelect" type="Button" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 554.0
+offset_right = 152.0
+offset_bottom = 608.0
+theme_override_font_sizes/font_size = 17
+text = "关卡选择"
+
+[node name="Next" type="Button" parent="HUD/Sidebar"]
+offset_left = 174.0
+offset_top = 554.0
+offset_right = 310.0
+offset_bottom = 608.0
+theme_override_font_sizes/font_size = 17
+disabled = true
+text = "下一关"
+
+[node name="Help" type="Label" parent="HUD/Sidebar"]
+offset_left = 16.0
+offset_top = 628.0
+offset_right = 310.0
+offset_bottom = 694.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 16
+text = "左键：放置 / 旋转\n右键：删除并退款"
+
+[node name="Message" type="Label" parent="HUD"]
+offset_left = 390.0
+offset_top = 820.0
+offset_right = 1450.0
+offset_bottom = 870.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 22
+text = "选择装置并开始施工。"
+
+[node name="RuntimeStats" type="Label" parent="HUD"]
+offset_left = 390.0
+offset_top = 885.0
+offset_right = 1500.0
+offset_bottom = 950.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 16
+text = "Remote Inspector：Session / BuildController / BoardView / CargoView / AudioDirector"
