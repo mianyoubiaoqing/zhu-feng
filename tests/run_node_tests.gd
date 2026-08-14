@@ -9,6 +9,9 @@ func _init() -> void:
 
 
 func _run() -> void:
+	var game_flow := get_root().get_node_or_null("GameFlow")
+	_expect(game_flow != null, "关卡流程单例已加载")
+	game_flow.call("select_level", 5)
 	var packed_scene := load("res://scenes/main.tscn") as PackedScene
 	var root := packed_scene.instantiate()
 	get_root().add_child(root)
@@ -34,7 +37,10 @@ func _run() -> void:
 	_expect(session.debug_phase == "RESULT" and not session.debug_last_result.is_empty(), "测试结果写入Session调试字段")
 	cargo_view.step_duration = 0.01
 	cargo_view.play_result(result)
-	await create_timer(0.15).timeout
+	var animation_frames := 0
+	while cargo_view.debug_animating and animation_frames < 120:
+		await process_frame
+		animation_frames += 1
 	_expect(not cargo_view.debug_animating and cargo_view.debug_outcome != "PENDING", "CargoView节点完成路线表现并暴露结果")
 
 	session.return_to_build()

@@ -20,7 +20,7 @@ func _run() -> void:
 	var exit_button := root.get_node("MenuPanel/Exit") as Button
 	_expect(menu != null, "开始菜单节点实例化")
 	_expect(menu.debug_title_texture_ready and title.texture != null, "标题有效区域已绑定")
-	_expect(menu.gameplay_scene_path == "res://scenes/main.tscn" and ResourceLoader.exists(menu.gameplay_scene_path), "开始按钮目标为游戏场景")
+	_expect(menu.gameplay_scene_path == "res://scenes/level_select.tscn" and ResourceLoader.exists(menu.gameplay_scene_path), "开始按钮目标为关卡选择")
 	_expect(not start_button.get_signal_connection_list(&"pressed").is_empty(), "开始按钮已连接")
 	_expect(not exit_button.get_signal_connection_list(&"pressed").is_empty(), "退出按钮已连接")
 	_expect(ProjectSettings.get_setting("application/run/main_scene") == "res://scenes/start_menu.tscn", "项目启动入口为开始菜单")

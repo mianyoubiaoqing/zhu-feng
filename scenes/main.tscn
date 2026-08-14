@@ -263,13 +263,22 @@ offset_bottom = 538.0
 theme_override_font_sizes/font_size = 17
 text = "重新测试"
 
-[node name="Menu" type="Button" parent="HUD/Sidebar"]
+[node name="LevelSelect" type="Button" parent="HUD/Sidebar"]
 offset_left = 16.0
+offset_top = 554.0
+offset_right = 152.0
+offset_bottom = 608.0
+theme_override_font_sizes/font_size = 17
+text = "关卡选择"
+
+[node name="Next" type="Button" parent="HUD/Sidebar"]
+offset_left = 174.0
 offset_top = 554.0
 offset_right = 310.0
 offset_bottom = 608.0
 theme_override_font_sizes/font_size = 17
-text = "返回主菜单"
+disabled = true
+text = "下一关"
 
 [node name="Help" type="Label" parent="HUD/Sidebar"]
 offset_left = 16.0

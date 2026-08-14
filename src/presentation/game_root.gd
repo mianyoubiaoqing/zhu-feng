@@ -8,6 +8,11 @@ extends Node2D
 @onready var budget_label: Label = $HUD/Sidebar/Budget
 @onready var message_label: Label = $HUD/Message
 @onready var runtime_label: Label = $HUD/RuntimeStats
+@onready var level_title_label: Label = $HUD/Title
+@onready var level_subtitle_label: Label = $HUD/Subtitle
+@onready var next_button: Button = $HUD/Sidebar/Next
+@onready var _game_flow: Node = get_node("/root/GameFlow")
+var _level_completed := false
 
 
 func _ready() -> void:
@@ -22,11 +27,14 @@ func _ready() -> void:
 	$HUD/Sidebar/Start.pressed.connect(_on_start)
 	$HUD/Sidebar/Build.pressed.connect(_on_return_to_build)
 	$HUD/Sidebar/Retry.pressed.connect(_on_start)
-	$HUD/Sidebar/Menu.pressed.connect(_on_return_to_menu)
+	$HUD/Sidebar/LevelSelect.pressed.connect(_on_return_to_level_select)
+	next_button.pressed.connect(_on_next_level)
 	if not session.is_initialized():
 		_set_message(session.debug_last_error)
 		return
 	cargo_view.reset_to(session.level().start)
+	level_title_label.text = "筑风 · 第%02d关｜%s" % [_game_flow.get("selected_level_index") + 1, session.level().display_name]
+	level_subtitle_label.text = "%s\n提示：%s" % [session.level().objective, session.level().teaching_tip]
 	_select_device(GameRules.DeviceKind.BEND)
 	_refresh_hud()
 
@@ -63,6 +71,7 @@ func _on_start() -> void:
 	if not session.is_initialized():
 		return
 	board_view.clear_result()
+	_level_completed = false
 	var result := session.start_test()
 	audio_director.start_test(result.powered_turbine_ids.size())
 	cargo_view.play_result(result)
@@ -80,18 +89,31 @@ func _on_return_to_build() -> void:
 	_set_message("已返回建造，布局与风机朝向保持不变。")
 
 
-func _on_return_to_menu() -> void:
+func _on_return_to_level_select() -> void:
 	audio_director.stop_all_audio()
-	get_tree().change_scene_to_file("res://scenes/start_menu.tscn")
+	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+
+
+func _on_next_level() -> void:
+	if not _level_completed:
+		return
+	audio_director.stop_all_audio()
+	if _game_flow.call("select_next_level") as bool:
+		get_tree().reload_current_scene()
+	else:
+		get_tree().change_scene_to_file("res://scenes/level_select.tscn")
 
 
 func _on_cargo_animation_finished(result: SimulationResult) -> void:
 	board_view.show_result(result)
 	audio_director.play_result(result)
 	if result.succeeded:
+		_level_completed = true
+		_game_flow.call("mark_selected_completed")
 		_set_message("通关%s" % ("（精简设计）" if result.efficient else ""))
 	else:
 		_set_message(result.failure_label())
+	_refresh_hud()
 
 
 func _refresh_hud() -> void:
@@ -107,6 +129,8 @@ func _refresh_hud() -> void:
 	build_controller.input_enabled = in_build
 	$HUD/Sidebar/Undo.disabled = not in_build
 	$HUD/Sidebar/Build.disabled = in_build
+	next_button.disabled = not _level_completed
+	next_button.text = "完成委托" if _game_flow.get("selected_level_index") >= DemoLevels.LEVEL_COUNT - 1 else "下一关"
 
 
 func _set_message(message: String) -> void:

@@ -34,7 +34,8 @@ func _ready() -> void:
 
 func initialize() -> bool:
 	if level_definition == null and use_demo_level_when_empty:
-		level_definition = DemoLevels.build_vertical_slice()
+		var game_flow := get_node_or_null("/root/GameFlow")
+		level_definition = game_flow.call("selected_level") if game_flow != null else DemoLevels.build_vertical_slice()
 	if level_definition == null:
 		debug_last_error = "未配置 LevelDefinition"
 		return false

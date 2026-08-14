@@ -3,6 +3,8 @@ extends Resource
 
 @export var level_id: StringName = &"unnamed"
 @export var display_name := "未命名关卡"
+@export_multiline var objective := "让风种抵达终点"
+@export_multiline var teaching_tip := "观察风向，再开始施工。"
 @export var size: Vector2i = Vector2i(8, 6)
 @export var budget := 8
 @export var efficient_budget := 6

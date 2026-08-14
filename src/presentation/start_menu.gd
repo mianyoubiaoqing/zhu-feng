@@ -1,7 +1,7 @@
 class_name StartMenu
 extends Control
 
-@export_file("*.tscn") var gameplay_scene_path := "res://scenes/main.tscn"
+@export_file("*.tscn") var gameplay_scene_path := "res://scenes/level_select.tscn"
 @export_range(0.05, 1.0, 0.05) var transition_duration := 0.22
 
 @export_category("Runtime Debug (read only)")

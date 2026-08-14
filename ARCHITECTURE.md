@@ -38,6 +38,8 @@ CargoSimulator.simulate(level, wind_solution, spent_budget) -> SimulationResult
 - `CargoView`：只负责沿逻辑路线平滑移动，暴露路线长度、当前索引、步内进度和最终结果。
 - `AudioDirector`：集中持有 15 段音频和四个 `AudioStreamPlayer`，按 UI、施工、风流、机关与结果事件播放，并在 Inspector 暴露最后音频事件。
 - `StartMenu`：项目启动入口，显示标题有效区域，处理开始、退出、键盘焦点和淡出切场景。
+- `LevelSelect`：动态读取六个 `LevelDefinition`，生成关卡卡片并显示运行期完成状态。
+- `GameFlow`：Autoload，保存当前关卡索引与本次运行的完成记录，不持有关卡规则。
 - `GameRoot`：连接按钮和上述 Node 的信号，不实现规则。
 
 这些 Node 是 adapter。删除它们不会删除规则复杂度；规则仍集中在纯 module 中，自动测试也仍穿过相同的 `WindSolver`、`CargoSimulator` 和 `GameSession` interface。
@@ -67,6 +69,7 @@ default_bus_layout.tres  UI / SFX / Ambience 音频总线
 godot --headless --path . --script res://tests/run_rule_tests.gd
 godot --headless --path . --script res://tests/run_node_tests.gd
 godot --headless --path . --script res://tests/run_menu_tests.gd
+godot --headless --path . --script res://tests/run_level_tests.gd
 ```
 
 验证场景覆盖直线传播、双向弯管、挡风、单向阀、同向合并、异向抵消、闭环、涡轮—门、风种送达、预算和撤销。
