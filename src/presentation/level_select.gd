@@ -3,6 +3,7 @@ extends Control
 
 @export_file("*.tscn") var gameplay_scene_path := "res://scenes/main.tscn"
 @export_file("*.tscn") var menu_scene_path := "res://scenes/start_menu.tscn"
+@export_file("*.tscn") var editor_scene_path := "res://scenes/level_editor.tscn"
 @export_range(0.05, 1.0, 0.05) var transition_duration := 0.18
 
 @export_category("Runtime Debug (read only)")
@@ -15,6 +16,7 @@ extends Control
 @onready var _hover_info: Label = $HoverInfo
 @onready var _progress: Label = $Progress
 @onready var _back: Button = $Back
+@onready var _editor: Button = $Editor
 @onready var _fade: ColorRect = $Fade
 @onready var _confirm: AudioStreamPlayer = $Confirm
 @onready var _game_flow: Node = get_node("/root/GameFlow")
@@ -24,6 +26,7 @@ var _level_buttons: Array[Button] = []
 func _ready() -> void:
 	_build_level_cards()
 	_back.pressed.connect(_on_back_pressed)
+	_editor.pressed.connect(_on_editor_pressed)
 	_refresh_progress()
 	if not _level_buttons.is_empty():
 		_level_buttons[_game_flow.get("selected_level_index")].grab_focus()
@@ -100,10 +103,22 @@ func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file(menu_scene_path)
 
 
+func _on_editor_pressed() -> void:
+	if debug_transition_locked:
+		return
+	debug_transition_locked = true
+	debug_last_action = "EDITOR"
+	var error := get_tree().change_scene_to_file(editor_scene_path)
+	if error != OK:
+		debug_last_action = "ERROR | 编辑器场景切换失败：%d" % error
+		debug_transition_locked = false
+
+
 func _set_buttons_disabled(disabled: bool) -> void:
 	for button in _level_buttons:
 		button.disabled = disabled
 	_back.disabled = disabled
+	_editor.disabled = disabled
 
 
 func _refresh_progress() -> void:

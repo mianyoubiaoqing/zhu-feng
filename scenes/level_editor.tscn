@@ -1,0 +1,652 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/level_editor.gd" id="1_editor"]
+[ext_resource type="Script" path="res://src/editor/level_editor_board.gd" id="2_board"]
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(0.984, 0.969, 0.894, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.251, 0.329, 0.353, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.08, 0.12, 0.13, 0.15)
+shadow_size = 9
+
+[sub_resource type="StyleBoxFlat" id="Style_button"]
+bg_color = Color(0.957, 0.918, 0.784, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.251, 0.329, 0.353, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_button_hover"]
+bg_color = Color(1, 0.941, 0.741, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.161, 0.565, 0.506, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_button_pressed"]
+bg_color = Color(0.216, 0.651, 0.651, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.125, 0.204, 0.231, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_primary"]
+bg_color = Color(0.161, 0.565, 0.506, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.125, 0.204, 0.231, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.08, 0.12, 0.13, 0.18)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="Style_edit"]
+bg_color = Color(1, 0.988, 0.929, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.541, 0.475, 0.408, 0.75)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_right = 10.0
+
+[sub_resource type="StyleBoxFlat" id="Style_status"]
+bg_color = Color(0.984, 0.969, 0.894, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.541, 0.475, 0.408, 0.65)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="LevelEditor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_editor")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.737, 0.875, 0.82, 1)
+
+[node name="TopBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 22.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.161, 0.565, 0.506, 1)
+
+[node name="EditorBoard" type="Node2D" parent="."]
+script = ExtResource("2_board")
+
+[node name="BoardInput" type="Control" parent="."]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 138.0
+offset_right = 1440.0
+offset_bottom = 928.0
+mouse_default_cursor_shape = 2
+
+[node name="Heading" type="Label" parent="."]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 35.0
+offset_right = 540.0
+offset_bottom = 89.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 36
+text = "筑风 · 关卡工坊"
+
+[node name="Subheading" type="Label" parent="."]
+layout_mode = 0
+offset_left = 555.0
+offset_top = 49.0
+offset_right = 1430.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 19
+text = "绘制地形与机关，校验后直接进入完整游戏流程试玩"
+
+[node name="Back" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1615.0
+offset_top = 38.0
+offset_right = 1888.0
+offset_bottom = 91.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/focus = SubResource("Style_button_hover")
+text = "返回关卡选择"
+
+[node name="LeftPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 128.0
+offset_right = 328.0
+offset_bottom = 920.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Title" type="Label" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 20.0
+offset_right = 280.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 24
+text = "绘制工具"
+horizontal_alignment = 1
+
+[node name="Floor" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 78.0
+offset_right = 145.0
+offset_bottom = 132.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "地面"
+
+[node name="Wall" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 78.0
+offset_right = 288.0
+offset_bottom = 132.0
+toggle_mode = true
+button_pressed = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "墙体"
+
+[node name="Pit" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 146.0
+offset_right = 145.0
+offset_bottom = 200.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "深坑"
+
+[node name="Erase" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 146.0
+offset_right = 288.0
+offset_bottom = 200.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "擦除"
+
+[node name="Start" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 214.0
+offset_right = 145.0
+offset_bottom = 268.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "起点"
+
+[node name="Goal" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 214.0
+offset_right = 288.0
+offset_bottom = 268.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "终点"
+
+[node name="Fan" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 282.0
+offset_right = 145.0
+offset_bottom = 336.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "风机"
+
+[node name="Turbine" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 282.0
+offset_right = 288.0
+offset_bottom = 336.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "涡轮"
+
+[node name="Door" type="Button" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 350.0
+offset_right = 288.0
+offset_bottom = 407.0
+toggle_mode = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+theme_override_styles/pressed = SubResource("Style_button_pressed")
+text = "联动门"
+
+[node name="Divider" type="HSeparator" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 430.0
+offset_right = 282.0
+offset_bottom = 434.0
+
+[node name="ToolHint" type="Label" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 459.0
+offset_right = 282.0
+offset_bottom = 548.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 18
+text = "墙体：阻断风路与风种"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Guide" type="Label" parent="LeftPanel"]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 578.0
+offset_right = 282.0
+offset_bottom = 744.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "操作\n\n左键：使用当前工具\n右键：快速擦除\nEsc：返回关卡选择\n\n风机为固定装置；试玩时可以旋转。"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RightPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 1470.0
+offset_top = 128.0
+offset_right = 1898.0
+offset_bottom = 1030.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Title" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 15.0
+offset_right = 404.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 23
+text = "关卡参数"
+horizontal_alignment = 1
+
+[node name="NameLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 53.0
+offset_right = 150.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "关卡名称"
+
+[node name="NameEdit" type="LineEdit" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 80.0
+offset_right = 404.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_edit")
+placeholder_text = "我的风路"
+
+[node name="ObjectiveLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 126.0
+offset_right = 150.0
+offset_bottom = 151.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "任务目标"
+
+[node name="ObjectiveEdit" type="LineEdit" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 153.0
+offset_right = 404.0
+offset_bottom = 193.0
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_edit")
+
+[node name="TipLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 199.0
+offset_right = 150.0
+offset_bottom = 224.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "施工提示"
+
+[node name="TipEdit" type="LineEdit" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 226.0
+offset_right = 404.0
+offset_bottom = 266.0
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_edit")
+
+[node name="SizeLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 274.0
+offset_right = 180.0
+offset_bottom = 299.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "画布尺寸"
+
+[node name="WidthSpin" type="SpinBox" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 301.0
+offset_right = 174.0
+offset_bottom = 341.0
+min_value = 6.0
+max_value = 16.0
+value = 10.0
+suffix = " 列"
+
+[node name="HeightSpin" type="SpinBox" parent="RightPanel"]
+layout_mode = 0
+offset_left = 188.0
+offset_top = 301.0
+offset_right = 338.0
+offset_bottom = 341.0
+min_value = 4.0
+max_value = 10.0
+value = 6.0
+suffix = " 行"
+
+[node name="ApplySize" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 348.0
+offset_top = 301.0
+offset_right = 404.0
+offset_bottom = 341.0
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "应用"
+
+[node name="BudgetLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 351.0
+offset_right = 260.0
+offset_bottom = 376.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "施工预算 / 精简目标"
+
+[node name="BudgetSpin" type="SpinBox" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 378.0
+offset_right = 208.0
+offset_bottom = 418.0
+max_value = 40.0
+value = 8.0
+
+[node name="EfficientSpin" type="SpinBox" parent="RightPanel"]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 378.0
+offset_right = 404.0
+offset_bottom = 418.0
+max_value = 40.0
+value = 6.0
+
+[node name="DirectionLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 428.0
+offset_right = 180.0
+offset_bottom = 453.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "新风机朝向"
+
+[node name="DirectionOption" type="OptionButton" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 455.0
+offset_right = 404.0
+offset_bottom = 495.0
+theme_override_font_sizes/font_size = 17
+
+[node name="LinkLabel" type="Label" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 505.0
+offset_right = 270.0
+offset_bottom = 530.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+text = "涡轮 / 门联动 ID"
+
+[node name="LinkEdit" type="LineEdit" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 532.0
+offset_right = 404.0
+offset_bottom = 572.0
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_edit")
+text = "wind_1"
+placeholder_text = "例如 wind_1"
+
+[node name="RequiredToggle" type="CheckBox" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 580.0
+offset_right = 404.0
+offset_bottom = 620.0
+button_pressed = true
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 16
+text = "新涡轮必须供能才可通关"
+
+[node name="New" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 636.0
+offset_right = 139.0
+offset_bottom = 684.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "新建"
+
+[node name="Save" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 151.0
+offset_top = 636.0
+offset_right = 276.0
+offset_bottom = 684.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "保存"
+
+[node name="Load" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 288.0
+offset_top = 636.0
+offset_right = 404.0
+offset_bottom = 684.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "读取"
+
+[node name="Copy" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 694.0
+offset_right = 208.0
+offset_bottom = 742.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "复制 JSON"
+
+[node name="Paste" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 694.0
+offset_right = 404.0
+offset_bottom = 742.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "粘贴 JSON"
+
+[node name="Validate" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 752.0
+offset_right = 404.0
+offset_bottom = 800.0
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Style_button")
+theme_override_styles/hover = SubResource("Style_button_hover")
+text = "校验关卡"
+
+[node name="Test" type="Button" parent="RightPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 810.0
+offset_right = 404.0
+offset_bottom = 872.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.988, 0.929, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Style_primary")
+theme_override_styles/hover = SubResource("Style_primary")
+theme_override_styles/focus = SubResource("Style_primary")
+text = "一键试玩"
+
+[node name="StatusPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 370.0
+offset_top = 952.0
+offset_right = 1435.0
+offset_bottom = 1018.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_status")
+
+[node name="Status" type="Label" parent="."]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 962.0
+offset_right = 1413.0
+offset_bottom = 1008.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+text = "左键绘制 · 右键擦除 · 完成后点击“一键试玩”"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

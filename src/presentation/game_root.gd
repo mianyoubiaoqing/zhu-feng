@@ -32,6 +32,7 @@ var _status_tween: Tween
 var _result_tween: Tween
 var _cost_tween: Tween
 var _sidebar_tween: Tween
+var _is_custom_level := false
 
 
 func _ready() -> void:
@@ -53,9 +54,16 @@ func _ready() -> void:
 		_set_message(session.debug_last_error)
 		return
 	_configure_board_geometry()
+	_is_custom_level = _game_flow.call("has_custom_level") as bool
 	_last_spent_budget = session.spent_budget()
 	cargo_view.reset_to(session.level().start)
-	level_title_label.text = "筑风 · 第%02d关｜%s" % [_game_flow.get("selected_level_index") + 1, session.level().display_name]
+	level_title_label.text = (
+		"筑风 · 工坊试玩｜%s" % session.level().display_name
+		if _is_custom_level
+		else "筑风 · 第%02d关｜%s" % [_game_flow.get("selected_level_index") + 1, session.level().display_name]
+	)
+	if _is_custom_level:
+		$HUD/LevelSelect.text = "返回工坊"
 	level_subtitle_label.text = "%s\n提示：%s" % [session.level().objective, session.level().teaching_tip]
 	_select_device(GameRules.DeviceKind.BEND)
 	_refresh_hud()
@@ -146,13 +154,16 @@ func _on_return_to_build() -> void:
 
 func _on_return_to_level_select() -> void:
 	audio_director.stop_all_audio()
-	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+	get_tree().change_scene_to_file("res://scenes/level_editor.tscn" if _is_custom_level else "res://scenes/level_select.tscn")
 
 
 func _on_next_level() -> void:
 	if not _level_completed:
 		return
 	audio_director.stop_all_audio()
+	if _is_custom_level:
+		get_tree().change_scene_to_file("res://scenes/level_editor.tscn")
+		return
 	if _game_flow.call("select_next_level") as bool:
 		get_tree().reload_current_scene()
 	else:
@@ -193,7 +204,10 @@ func _refresh_hud() -> void:
 	$HUD/Sidebar/Build.disabled = in_build
 	$HUD/Sidebar/Retry.disabled = in_build
 	next_button.disabled = not _level_completed
-	next_button.text = "完成委托" if _game_flow.get("selected_level_index") >= DemoLevels.LEVEL_COUNT - 1 else "下一关"
+	if _is_custom_level:
+		next_button.text = "返回工坊"
+	else:
+		next_button.text = "完成委托" if _game_flow.get("selected_level_index") >= DemoLevels.LEVEL_COUNT - 1 else "下一关"
 
 
 func _set_message(message: String) -> void:

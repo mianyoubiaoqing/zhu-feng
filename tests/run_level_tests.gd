@@ -37,6 +37,7 @@ func _run() -> void:
 	var select := select_root as LevelSelect
 	_expect(select != null and select.debug_level_count == 6, "关卡选择场景生成6张关卡卡片")
 	_expect(select_root.get_node("LevelGrid").get_child_count() == 6, "关卡卡片全部进入场景树")
+	_expect(select_root.get_node_or_null("Editor") is Button, "关卡选择页提供关卡工坊入口")
 
 	print("关卡验证完成：%d checks，%d failures" % [checks, failures])
 	select_root.queue_free()
