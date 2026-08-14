@@ -27,6 +27,17 @@ func _run() -> void:
 	_expect(board_view.debug_loaded_art_assets == 34, "BoardView绑定全部34张棋盘图片")
 	_expect(audio_director.debug_loaded_audio_assets == 15, "AudioDirector绑定全部15段音频")
 	_expect((root.get_node("HUD/Sidebar/MoneyIcon") as TextureRect).texture != null, "HUD绑定预算金币图片")
+	var sidebar := root.get_node("HUD/Sidebar") as Panel
+	var panel_style := sidebar.get_theme_stylebox("panel") as StyleBoxTexture
+	_expect(panel_style != null and panel_style.texture != null, "施工侧栏绑定美术面板")
+	var skinned_buttons := true
+	for button_name in ["Bend", "Blocker", "Valve", "Undo", "Start", "Build", "Retry"]:
+		var button := sidebar.get_node(button_name) as Button
+		var button_style := button.get_theme_stylebox("normal") as StyleBoxTexture
+		if button_style == null or button_style.texture == null:
+			skinned_buttons = false
+	_expect(skinned_buttons, "施工按钮绑定裁切后的UI美术")
+	_expect(root.get_node_or_null("HUD/LevelSelect") != null and root.get_node_or_null("HUD/Next") != null, "关卡导航避开施工面板并保持可用")
 
 	var initial_wind_cells := session.debug_wind_cell_count
 	var placed := session.place_device(GameRules.DeviceKind.BLOCKER, Vector2i(2, 5))
