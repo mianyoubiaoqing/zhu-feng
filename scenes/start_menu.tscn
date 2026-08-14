@@ -1,0 +1,250 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/start_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/title.png" id="2_title"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/confirm_01.wav" id="3_confirm"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_body.png" id="4_fan_body"]
+[ext_resource type="Texture2D" path="res://assets/art/objects/wind_fan_blades.png" id="5_fan_blades"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_title"]
+atlas = ExtResource("2_title")
+region = Rect2(1020, 937, 1384, 719)
+filter_clip = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
+bg_color = Color(0.984, 0.969, 0.894, 0.97)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.224, 0.31, 0.357, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.086, 0.118, 0.129, 0.25)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button_normal"]
+bg_color = Color(0.925, 0.757, 0.384, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.224, 0.31, 0.357, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button_hover"]
+bg_color = Color(0.98, 0.835, 0.49, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.161, 0.565, 0.506, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.161, 0.565, 0.506, 0.24)
+shadow_size = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button_pressed"]
+bg_color = Color(0.808, 0.627, 0.286, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.224, 0.31, 0.357, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="StartMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.737, 0.875, 0.82, 1)
+
+[node name="TopBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 26.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.161, 0.565, 0.506, 1)
+
+[node name="BottomBand" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.925, 0.757, 0.384, 1)
+
+[node name="LeftFanBody" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 650.0
+offset_right = 410.0
+offset_bottom = 850.0
+mouse_filter = 2
+texture = ExtResource("4_fan_body")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.55)
+
+[node name="LeftFanBlades" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 650.0
+offset_right = 410.0
+offset_bottom = 850.0
+pivot_offset = Vector2(100, 100)
+mouse_filter = 2
+texture = ExtResource("5_fan_blades")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.55)
+
+[node name="RightFanBody" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1510.0
+offset_top = 180.0
+offset_right = 1710.0
+offset_bottom = 380.0
+mouse_filter = 2
+texture = ExtResource("4_fan_body")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.48)
+
+[node name="RightFanBlades" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1510.0
+offset_top = 180.0
+offset_right = 1710.0
+offset_bottom = 380.0
+pivot_offset = Vector2(100, 100)
+mouse_filter = 2
+texture = ExtResource("5_fan_blades")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.48)
+
+[node name="MenuPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -440.0
+offset_right = 420.0
+offset_bottom = 440.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="Title" type="TextureRect" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 56.0
+offset_right = 760.0
+offset_bottom = 410.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_title")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tagline" type="Label" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 425.0
+offset_right = 760.0
+offset_bottom = 475.0
+theme_override_colors/font_color = Color(0.224, 0.31, 0.357, 1)
+theme_override_font_sizes/font_size = 24
+text = "修筑风路，让风种抵达工坊终点"
+horizontal_alignment = 1
+
+[node name="Start" type="Button" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 530.0
+offset_right = 680.0
+offset_bottom = 610.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_colors/font_hover_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_colors/font_pressed_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBox_button_normal")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/pressed = SubResource("StyleBox_button_pressed")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "开始筑风"
+
+[node name="Exit" type="Button" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 640.0
+offset_right = 680.0
+offset_bottom = 720.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_colors/font_hover_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_colors/font_pressed_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBox_button_normal")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/pressed = SubResource("StyleBox_button_pressed")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "退出游戏"
+
+[node name="Footer" type="Label" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 790.0
+offset_right = 760.0
+offset_bottom = 830.0
+theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_font_sizes/font_size = 17
+text = "Game Jam Demo · 鼠标或键盘均可操作"
+horizontal_alignment = 1
+
+[node name="Fade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.11, 0.12, 0)
+
+[node name="Confirm" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_confirm")
+bus = &"UI"
