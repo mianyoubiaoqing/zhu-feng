@@ -42,6 +42,13 @@ func _run() -> void:
 	_expect(skinned_buttons, "施工按钮绑定裁切后的UI美术")
 	_expect((sidebar.get_node("Bend") as Button).button_pressed, "默认装置以持续高亮反馈当前选择")
 	_expect(root.get_node_or_null("HUD/LevelSelect") != null and root.get_node_or_null("HUD/Next") != null, "关卡导航避开施工面板并保持可用")
+	var next_button := root.get_node("HUD/Next") as Button
+	var message := root.get_node("HUD/Message") as Label
+	var board_right := board_view.board_origin.x + float(session.level().size.x) * board_view.cell_size
+	var board_bottom := board_view.board_origin.y + float(session.level().size.y) * board_view.cell_size
+	_expect(next_button.position.y > board_bottom, "下一关按钮位于地图下方")
+	_expect(is_equal_approx(next_button.position.x + next_button.size.x, board_right), "下一关按钮与地图右边缘对齐")
+	_expect(not next_button.get_rect().intersects(message.get_rect()), "下一关按钮不遮挡状态文字")
 	_expect(not (root.get_node("HUD/RuntimeStats") as Label).visible, "发布态默认隐藏运行时调试信息")
 
 	var initial_wind_cells := session.debug_wind_cell_count

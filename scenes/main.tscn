@@ -448,9 +448,9 @@ theme_override_font_sizes/font_size = 16
 text = "左键：放置 / 旋转\n右键：删除并退款\n测试后可返回建造继续调整"
 
 [node name="LevelSelect" type="Button" parent="HUD"]
-offset_left = 1510.0
+offset_left = 1710.0
 offset_top = 36.0
-offset_right = 1690.0
+offset_right = 1890.0
 offset_bottom = 90.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
@@ -463,10 +463,10 @@ theme_override_styles/focus = SubResource("StyleButtonWide")
 text = "关卡选择"
 
 [node name="Next" type="Button" parent="HUD"]
-offset_left = 1710.0
-offset_top = 36.0
-offset_right = 1890.0
-offset_bottom = 90.0
+offset_left = 1190.0
+offset_top = 850.0
+offset_right = 1490.0
+offset_bottom = 916.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
 theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
@@ -548,7 +548,7 @@ vertical_alignment = 1
 [node name="Message" type="Label" parent="HUD"]
 offset_left = 390.0
 offset_top = 860.0
-offset_right = 1450.0
+offset_right = 1160.0
 offset_bottom = 910.0
 theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
 theme_override_colors/font_outline_color = Color(0.98, 0.944, 0.79, 0.95)

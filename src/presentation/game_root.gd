@@ -224,6 +224,11 @@ func _configure_board_geometry() -> void:
 	board_view.configure_geometry(origin, size)
 	cargo_view.configure_geometry(origin, size)
 	build_controller.configure_geometry(origin, size)
+	var footer_y := origin.y + board_pixel_size.y + 18.0
+	next_button.position = Vector2(origin.x + board_pixel_size.x - next_button.size.x, footer_y)
+	message_label.position = Vector2(origin.x, footer_y + 5.0)
+	message_label.size.x = maxf(320.0, board_pixel_size.x - next_button.size.x - 30.0)
+	runtime_label.position = Vector2(origin.x, footer_y + 72.0)
 
 
 func _animate_cost_delta(delta: int) -> void:
