@@ -25,6 +25,9 @@ const MAX_CELL_SIZE := 140.0
 @onready var result_title: Label = $HUD/ResultPanel/Title
 @onready var result_body: Label = $HUD/ResultPanel/Body
 @onready var cost_pop: Label = $HUD/CostPop
+@onready var device_tooltip: Panel = $HUD/DeviceTooltip
+@onready var device_tooltip_label: Label = $HUD/DeviceTooltip/Label
+@onready var device_hover_timer: Timer = $HUD/DeviceHoverTimer
 @onready var _game_flow: Node = get_node("/root/GameFlow")
 var _level_completed := false
 var _last_spent_budget := 0
@@ -32,7 +35,10 @@ var _status_tween: Tween
 var _result_tween: Tween
 var _cost_tween: Tween
 var _sidebar_tween: Tween
+var _tooltip_tween: Tween
 var _is_custom_level := false
+var _hovered_device_kind := -1
+var _hovered_device_button: Button
 
 
 func _ready() -> void:
@@ -44,6 +50,10 @@ func _ready() -> void:
 	$HUD/Sidebar/Bend.pressed.connect(_select_device.bind(GameRules.DeviceKind.BEND))
 	$HUD/Sidebar/Blocker.pressed.connect(_select_device.bind(GameRules.DeviceKind.BLOCKER))
 	$HUD/Sidebar/Valve.pressed.connect(_select_device.bind(GameRules.DeviceKind.ONE_WAY_VALVE))
+	_bind_device_hover(bend_button, GameRules.DeviceKind.BEND)
+	_bind_device_hover(blocker_button, GameRules.DeviceKind.BLOCKER)
+	_bind_device_hover(valve_button, GameRules.DeviceKind.ONE_WAY_VALVE)
+	device_hover_timer.timeout.connect(_on_device_hover_timeout)
 	$HUD/Sidebar/Undo.pressed.connect(_on_undo)
 	$HUD/Sidebar/Start.pressed.connect(_on_start)
 	$HUD/Sidebar/Build.pressed.connect(_on_return_to_build)
@@ -95,6 +105,54 @@ func _select_device(kind: int) -> void:
 	blocker_button.button_pressed = kind == GameRules.DeviceKind.BLOCKER
 	valve_button.button_pressed = kind == GameRules.DeviceKind.ONE_WAY_VALVE
 	_refresh_hud()
+
+
+func _bind_device_hover(button: Button, kind: int) -> void:
+	button.mouse_entered.connect(_on_device_hover_entered.bind(button, kind))
+	button.mouse_exited.connect(_on_device_hover_exited.bind(kind))
+
+
+func _on_device_hover_entered(button: Button, kind: int) -> void:
+	_hovered_device_button = button
+	_hovered_device_kind = kind
+	_hide_device_tooltip()
+	device_hover_timer.start()
+
+
+func _on_device_hover_exited(kind: int) -> void:
+	if _hovered_device_kind != kind:
+		return
+	_hovered_device_kind = -1
+	_hovered_device_button = null
+	device_hover_timer.stop()
+	_hide_device_tooltip()
+
+
+func _on_device_hover_timeout() -> void:
+	if _hovered_device_button == null or _hovered_device_kind < 0:
+		return
+	var descriptions := {
+		GameRules.DeviceKind.BEND: "导风板 · 2金币\n让风在当前格转弯。放置后左键可旋转，用来改变运输路线。",
+		GameRules.DeviceKind.BLOCKER: "挡风板 · 1金币\n截断经过当前格的风，可隔离不需要的支路或交叉风。",
+		GameRules.DeviceKind.ONE_WAY_VALVE: "单向风阀 · 2金币\n只允许箭头方向的风通过；放置后左键可旋转。",
+	}
+	device_tooltip_label.text = descriptions.get(_hovered_device_kind, "")
+	device_tooltip.position = Vector2(
+		_hovered_device_button.global_position.x + _hovered_device_button.size.x + 18.0,
+		clampf(_hovered_device_button.global_position.y - 6.0, 110.0, 880.0)
+	)
+	device_tooltip.visible = true
+	device_tooltip.modulate = Color(1, 1, 1, 0)
+	if _tooltip_tween != null and _tooltip_tween.is_valid():
+		_tooltip_tween.kill()
+	_tooltip_tween = create_tween()
+	_tooltip_tween.tween_property(device_tooltip, "modulate:a", 1.0, 0.12)
+
+
+func _hide_device_tooltip() -> void:
+	if _tooltip_tween != null and _tooltip_tween.is_valid():
+		_tooltip_tween.kill()
+	device_tooltip.visible = false
 
 
 func _on_build_action_feedback(action: StringName, succeeded: bool) -> void:
@@ -197,6 +255,11 @@ func _refresh_hud() -> void:
 		build_controller.debug_selected_device,
 	]
 	var in_build := session.phase() == GameRules.Phase.BUILD
+	if not in_build:
+		_hovered_device_kind = -1
+		_hovered_device_button = null
+		device_hover_timer.stop()
+		_hide_device_tooltip()
 	build_controller.input_enabled = in_build
 	for button in [bend_button, blocker_button, valve_button, $HUD/Sidebar/Start]:
 		button.disabled = not in_build

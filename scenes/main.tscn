@@ -514,6 +514,32 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 27
 text = "-2"
 
+[node name="DeviceTooltip" type="Panel" parent="HUD"]
+visible = false
+z_index = 20
+offset_left = 370.0
+offset_top = 210.0
+offset_right = 790.0
+offset_bottom = 342.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleStatus")
+
+[node name="Label" type="Label" parent="HUD/DeviceTooltip"]
+offset_left = 22.0
+offset_top = 15.0
+offset_right = 398.0
+offset_bottom = 117.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.125, 0.204, 0.231, 1)
+theme_override_font_sizes/font_size = 18
+text = "导风板 · 2金币\n让风在当前格转弯。"
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeviceHoverTimer" type="Timer" parent="HUD"]
+wait_time = 0.5
+one_shot = true
+
 [node name="ResultPanel" type="Panel" parent="HUD"]
 visible = false
 z_index = 10

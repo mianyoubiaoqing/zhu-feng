@@ -40,7 +40,17 @@ func _run() -> void:
 		if button_style == null or button_style.texture == null:
 			skinned_buttons = false
 	_expect(skinned_buttons, "施工按钮绑定裁切后的UI美术")
-	_expect((sidebar.get_node("Bend") as Button).button_pressed, "默认装置以持续高亮反馈当前选择")
+	var bend_button := sidebar.get_node("Bend") as Button
+	_expect(bend_button.button_pressed, "默认装置以持续高亮反馈当前选择")
+	var hover_timer := root.get_node("HUD/DeviceHoverTimer") as Timer
+	var device_tooltip := root.get_node("HUD/DeviceTooltip") as Panel
+	_expect(is_equal_approx(hover_timer.wait_time, 0.5) and hover_timer.one_shot, "设施说明使用0.5秒单次悬停计时")
+	_expect(not device_tooltip.visible, "设施说明默认隐藏")
+	bend_button.mouse_entered.emit()
+	await create_timer(0.55).timeout
+	_expect(device_tooltip.visible and (device_tooltip.get_node("Label") as Label).text.contains("导风板 · 2金币"), "导风板悬停0.5秒后显示用途与价格")
+	bend_button.mouse_exited.emit()
+	_expect(not device_tooltip.visible, "鼠标移开后收起设施说明")
 	_expect(root.get_node_or_null("HUD/LevelSelect") != null and root.get_node_or_null("HUD/Next") != null, "关卡导航避开施工面板并保持可用")
 	var next_button := root.get_node("HUD/Next") as Button
 	var message := root.get_node("HUD/Message") as Label

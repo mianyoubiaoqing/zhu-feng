@@ -16,6 +16,8 @@ func _run() -> void:
 		_expect(level.validate().is_empty(), "%s通过结构校验" % level.display_name)
 		ids[level.level_id] = true
 	_expect(ids.size() == levels.size(), "关卡ID互不重复")
+	_expect(levels[0].budget == 2 and levels[0].efficient_budget == 0, "第一关提供2金币且无装置仍为精简解")
+	_test_first_level_device_trial(levels[0])
 
 	for index in levels.size():
 		var session := GameSession.new()
@@ -65,6 +67,14 @@ func _apply_reference_solution(index: int, session: GameSession) -> void:
 			session.place_device(GameRules.DeviceKind.BEND, Vector2i(6, 4), GameRules.Direction.UP)
 			session.place_device(GameRules.DeviceKind.BLOCKER, Vector2i(3, 3), GameRules.Direction.UP)
 			session.place_device(GameRules.DeviceKind.ONE_WAY_VALVE, Vector2i(9, 4), GameRules.Direction.RIGHT)
+
+
+func _test_first_level_device_trial(level: LevelDefinition) -> void:
+	var session := GameSession.new()
+	_expect(session.load_level(level), "第一关实验会话可加载")
+	for kind in [GameRules.DeviceKind.BEND, GameRules.DeviceKind.BLOCKER, GameRules.DeviceKind.ONE_WAY_VALVE]:
+		_expect(session.place_device(kind, Vector2i(3, 1)), "第一关预算可试放%s" % GameRules.DeviceKind.keys()[kind])
+		_expect(session.remove_device(Vector2i(3, 1)) and session.spent_budget() == 0, "拆除后返还试放预算")
 
 
 func _test_final_level_alternate_routes(level: LevelDefinition) -> void:

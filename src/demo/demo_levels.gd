@@ -21,9 +21,9 @@ static func build_level(index: int) -> LevelDefinition:
 
 
 static func build_fan_rotation() -> LevelDefinition:
-	var level := _base(&"fan_rotation", "转动风机", "让唯一的风机吹向风种。", "点击风机会顺时针旋转；本关不需要放置装置。")
+	var level := _base(&"fan_rotation", "转动风机", "让唯一的风机吹向风种。", "本关提供2金币；右键拆除会退款，可以依次试放三种装置，再转动风机完成委托。")
 	level.size = Vector2i(7, 5)
-	level.budget = 0
+	level.budget = 2
 	level.efficient_budget = 0
 	level.start = Vector2i(1, 2)
 	level.goal = Vector2i(6, 2)
