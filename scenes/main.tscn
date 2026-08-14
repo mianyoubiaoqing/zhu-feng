@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3]
+[gd_scene load_steps=74 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/game_root.gd" id="1_root"]
 [ext_resource type="Script" path="res://src/nodes/game_session_node.gd" id="2_session"]
@@ -28,6 +28,12 @@
 [ext_resource type="Texture2D" path="res://assets/art/feedback/failure_fall.png" id="29_fail_fall"]
 [ext_resource type="Texture2D" path="res://assets/art/feedback/failure_stop.png" id="30_fail_stop"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/money.png" id="31_money"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/construction_panel.png" id="32_panel"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/button_wide.png" id="33_button_wide"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/button_undo.png" id="34_button_undo"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/button_start.png" id="35_button_start"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/button_build.png" id="36_button_build"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/button_retry.png" id="37_button_retry"]
 [ext_resource type="AudioStream" path="res://assets/audio/ui/confirm_01.wav" id="40_confirm1"]
 [ext_resource type="AudioStream" path="res://assets/audio/ui/confirm_02.wav" id="41_confirm2"]
 [ext_resource type="AudioStream" path="res://assets/audio/build/place_valid.wav" id="42_place_valid"]
@@ -56,6 +62,61 @@
 [ext_resource type="Texture2D" path="res://assets/art/objects/turbine_powered.png" id="70_turbine_powered"]
 [ext_resource type="Texture2D" path="res://assets/art/devices/valve_horizontal.png" id="71_valve_horizontal"]
 [ext_resource type="Texture2D" path="res://assets/art/devices/valve_vertical.png" id="72_valve_vertical"]
+
+[sub_resource type="StyleBoxTexture" id="StylePanel"]
+texture = ExtResource("32_panel")
+
+[sub_resource type="AtlasTexture" id="AtlasButtonWide"]
+atlas = ExtResource("33_button_wide")
+region = Rect2(37, 209, 697, 162)
+filter_clip = true
+
+[sub_resource type="StyleBoxTexture" id="StyleButtonWide"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+texture = SubResource("AtlasButtonWide")
+
+[sub_resource type="AtlasTexture" id="AtlasButtonUndo"]
+atlas = ExtResource("34_button_undo")
+region = Rect2(38, 991, 328, 131)
+filter_clip = true
+
+[sub_resource type="StyleBoxTexture" id="StyleButtonUndo"]
+content_margin_left = 42.0
+content_margin_right = 10.0
+texture = SubResource("AtlasButtonUndo")
+
+[sub_resource type="AtlasTexture" id="AtlasButtonStart"]
+atlas = ExtResource("35_button_start")
+region = Rect2(407, 993, 328, 131)
+filter_clip = true
+
+[sub_resource type="StyleBoxTexture" id="StyleButtonStart"]
+content_margin_left = 42.0
+content_margin_right = 10.0
+texture = SubResource("AtlasButtonStart")
+
+[sub_resource type="AtlasTexture" id="AtlasButtonBuild"]
+atlas = ExtResource("36_button_build")
+region = Rect2(52, 1149, 328, 131)
+filter_clip = true
+
+[sub_resource type="StyleBoxTexture" id="StyleButtonBuild"]
+content_margin_left = 42.0
+content_margin_right = 10.0
+texture = SubResource("AtlasButtonBuild")
+
+[sub_resource type="AtlasTexture" id="AtlasButtonRetry"]
+atlas = ExtResource("37_button_retry")
+region = Rect2(411, 1149, 328, 131)
+filter_clip = true
+
+[sub_resource type="StyleBoxTexture" id="StyleButtonRetry"]
+content_margin_left = 42.0
+content_margin_right = 10.0
+texture = SubResource("AtlasButtonRetry")
 
 [node name="GameRoot" type="Node2D"]
 script = ExtResource("1_root")
@@ -179,12 +240,14 @@ offset_left = 24.0
 offset_top = 150.0
 offset_right = 350.0
 offset_bottom = 800.0
+theme_override_styles/panel = SubResource("StylePanel")
 
 [node name="Heading" type="Label" parent="HUD/Sidebar"]
 offset_left = 16.0
 offset_top = 18.0
 offset_right = 290.0
 offset_bottom = 54.0
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
 theme_override_font_sizes/font_size = 24
 text = "施工装置"
 
@@ -193,7 +256,16 @@ offset_left = 16.0
 offset_top = 72.0
 offset_right = 310.0
 offset_bottom = 132.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleButtonWide")
+theme_override_styles/hover = SubResource("StyleButtonWide")
+theme_override_styles/pressed = SubResource("StyleButtonWide")
+theme_override_styles/focus = SubResource("StyleButtonWide")
+theme_override_styles/disabled = SubResource("StyleButtonWide")
 text = "导风板 · 2 金币"
 
 [node name="Blocker" type="Button" parent="HUD/Sidebar"]
@@ -201,7 +273,16 @@ offset_left = 16.0
 offset_top = 146.0
 offset_right = 310.0
 offset_bottom = 206.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleButtonWide")
+theme_override_styles/hover = SubResource("StyleButtonWide")
+theme_override_styles/pressed = SubResource("StyleButtonWide")
+theme_override_styles/focus = SubResource("StyleButtonWide")
+theme_override_styles/disabled = SubResource("StyleButtonWide")
 text = "挡风板 · 1 金币"
 
 [node name="Valve" type="Button" parent="HUD/Sidebar"]
@@ -209,7 +290,16 @@ offset_left = 16.0
 offset_top = 220.0
 offset_right = 310.0
 offset_bottom = 280.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleButtonWide")
+theme_override_styles/hover = SubResource("StyleButtonWide")
+theme_override_styles/pressed = SubResource("StyleButtonWide")
+theme_override_styles/focus = SubResource("StyleButtonWide")
+theme_override_styles/disabled = SubResource("StyleButtonWide")
 text = "单向风阀 · 2 金币"
 
 [node name="MoneyIcon" type="TextureRect" parent="HUD/Sidebar"]
@@ -227,7 +317,7 @@ offset_left = 76.0
 offset_top = 306.0
 offset_right = 310.0
 offset_bottom = 390.0
-theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+theme_override_colors/font_color = Color(0.333, 0.286, 0.22, 1)
 theme_override_font_sizes/font_size = 18
 text = "施工 0 / 10\n精简目标 ≤ 7\n当前装置：导风板"
 
@@ -236,7 +326,16 @@ offset_left = 16.0
 offset_top = 414.0
 offset_right = 152.0
 offset_bottom = 468.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.875, 0.816, 0.745, 1)
+theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonUndo")
+theme_override_styles/hover = SubResource("StyleButtonUndo")
+theme_override_styles/pressed = SubResource("StyleButtonUndo")
+theme_override_styles/focus = SubResource("StyleButtonUndo")
+theme_override_styles/disabled = SubResource("StyleButtonUndo")
 text = "撤销"
 
 [node name="Start" type="Button" parent="HUD/Sidebar"]
@@ -244,7 +343,16 @@ offset_left = 174.0
 offset_top = 414.0
 offset_right = 310.0
 offset_bottom = 468.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.875, 0.816, 0.745, 1)
+theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonStart")
+theme_override_styles/hover = SubResource("StyleButtonStart")
+theme_override_styles/pressed = SubResource("StyleButtonStart")
+theme_override_styles/focus = SubResource("StyleButtonStart")
+theme_override_styles/disabled = SubResource("StyleButtonStart")
 text = "启动测试"
 
 [node name="Build" type="Button" parent="HUD/Sidebar"]
@@ -252,7 +360,16 @@ offset_left = 16.0
 offset_top = 484.0
 offset_right = 152.0
 offset_bottom = 538.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.875, 0.816, 0.745, 1)
+theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonBuild")
+theme_override_styles/hover = SubResource("StyleButtonBuild")
+theme_override_styles/pressed = SubResource("StyleButtonBuild")
+theme_override_styles/focus = SubResource("StyleButtonBuild")
+theme_override_styles/disabled = SubResource("StyleButtonBuild")
 text = "返回建造"
 
 [node name="Retry" type="Button" parent="HUD/Sidebar"]
@@ -260,34 +377,59 @@ offset_left = 174.0
 offset_top = 484.0
 offset_right = 310.0
 offset_bottom = 538.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.875, 0.816, 0.745, 1)
+theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
 theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonRetry")
+theme_override_styles/hover = SubResource("StyleButtonRetry")
+theme_override_styles/pressed = SubResource("StyleButtonRetry")
+theme_override_styles/focus = SubResource("StyleButtonRetry")
+theme_override_styles/disabled = SubResource("StyleButtonRetry")
 text = "重新测试"
-
-[node name="LevelSelect" type="Button" parent="HUD/Sidebar"]
-offset_left = 16.0
-offset_top = 554.0
-offset_right = 152.0
-offset_bottom = 608.0
-theme_override_font_sizes/font_size = 17
-text = "关卡选择"
-
-[node name="Next" type="Button" parent="HUD/Sidebar"]
-offset_left = 174.0
-offset_top = 554.0
-offset_right = 310.0
-offset_bottom = 608.0
-theme_override_font_sizes/font_size = 17
-disabled = true
-text = "下一关"
 
 [node name="Help" type="Label" parent="HUD/Sidebar"]
 offset_left = 16.0
-offset_top = 628.0
+offset_top = 560.0
 offset_right = 310.0
-offset_bottom = 694.0
-theme_override_colors/font_color = Color(0.369, 0.439, 0.459, 1)
+offset_bottom = 638.0
+theme_override_colors/font_color = Color(0.427, 0.384, 0.286, 1)
 theme_override_font_sizes/font_size = 16
-text = "左键：放置 / 旋转\n右键：删除并退款"
+text = "左键：放置 / 旋转\n右键：删除并退款\n测试后可返回建造继续调整"
+
+[node name="LevelSelect" type="Button" parent="HUD"]
+offset_left = 1510.0
+offset_top = 36.0
+offset_right = 1690.0
+offset_bottom = 90.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonWide")
+theme_override_styles/hover = SubResource("StyleButtonWide")
+theme_override_styles/pressed = SubResource("StyleButtonWide")
+theme_override_styles/focus = SubResource("StyleButtonWide")
+text = "关卡选择"
+
+[node name="Next" type="Button" parent="HUD"]
+offset_left = 1710.0
+offset_top = 36.0
+offset_right = 1890.0
+offset_bottom = 90.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.831, 0.757, 0.682, 1)
+theme_override_colors/font_disabled_color = Color(0.65, 0.596, 0.545, 0.7)
+theme_override_colors/font_hover_color = Color(1, 0.945, 0.82, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleButtonWide")
+theme_override_styles/hover = SubResource("StyleButtonWide")
+theme_override_styles/pressed = SubResource("StyleButtonWide")
+theme_override_styles/focus = SubResource("StyleButtonWide")
+theme_override_styles/disabled = SubResource("StyleButtonWide")
+disabled = true
+text = "下一关"
 
 [node name="Message" type="Label" parent="HUD"]
 offset_left = 390.0

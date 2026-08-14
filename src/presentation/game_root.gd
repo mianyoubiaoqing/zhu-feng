@@ -10,7 +10,7 @@ extends Node2D
 @onready var runtime_label: Label = $HUD/RuntimeStats
 @onready var level_title_label: Label = $HUD/Title
 @onready var level_subtitle_label: Label = $HUD/Subtitle
-@onready var next_button: Button = $HUD/Sidebar/Next
+@onready var next_button: Button = $HUD/Next
 @onready var _game_flow: Node = get_node("/root/GameFlow")
 var _level_completed := false
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 	$HUD/Sidebar/Start.pressed.connect(_on_start)
 	$HUD/Sidebar/Build.pressed.connect(_on_return_to_build)
 	$HUD/Sidebar/Retry.pressed.connect(_on_start)
-	$HUD/Sidebar/LevelSelect.pressed.connect(_on_return_to_level_select)
+	$HUD/LevelSelect.pressed.connect(_on_return_to_level_select)
 	next_button.pressed.connect(_on_next_level)
 	if not session.is_initialized():
 		_set_message(session.debug_last_error)
@@ -42,12 +42,12 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if not session.is_initialized():
 		return
-	runtime_label.text = "Remote Inspector：Session / BuildController / BoardView / CargoView / AudioDirector\n风格 %d · 冲突 %d · 闭环 %d · 路线步 %d · 美术 %d/35 · 音频 %d/15" % [
+	runtime_label.text = "Remote Inspector：Session / BuildController / BoardView / CargoView / AudioDirector\n风格 %d · 冲突 %d · 闭环 %d · 路线步 %d · 美术 %d/41 · 音频 %d/15" % [
 		session.debug_wind_cell_count,
 		session.debug_conflict_count,
 		session.debug_loop_cell_count,
 		cargo_view.debug_route_index,
-		board_view.debug_loaded_art_assets + 1,
+		board_view.debug_loaded_art_assets + 7,
 		audio_director.debug_loaded_audio_assets,
 	]
 
