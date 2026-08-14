@@ -165,7 +165,7 @@ func _on_cargo_animation_finished(result: SimulationResult) -> void:
 	if result.succeeded:
 		_level_completed = true
 		_game_flow.call("mark_selected_completed")
-		_set_message("通关%s" % ("（精简设计）" if result.efficient else ""))
+		_set_message("通关 · %s%s" % [result.route_style_label(), "（精简设计）" if result.efficient else ""])
 		_show_status("风种抵达终点", Color("d89f2b"), 1.1)
 	else:
 		_set_message(result.failure_label())
@@ -247,11 +247,15 @@ func _show_result_panel(result: SimulationResult) -> void:
 	result_title.text = "施工完成" if result.succeeded else "风路未接通"
 	if result.succeeded:
 		result_title.add_theme_color_override("font_color", Color("299083"))
-		result_body.text = "本次施工：%d / %d\n精简目标：≤ %d\n%s" % [
+		var turbine_status := "本关无涡轮" if session.level().turbines.is_empty() else ("全部供能" if result.all_turbines_powered else "存在未供能支线")
+		result_body.text = "方案记录：%s\n本次施工：%d / %d · 精简目标：≤ %d\n涡轮：%s · 调整风机：%d台\n使用装置类型：%d / 3" % [
+			result.route_style_label(),
 			session.spent_budget(),
 			session.level().budget,
 			session.level().efficient_budget,
-			"已达成精简方案" if result.efficient else "仍可返回施工压缩预算",
+			turbine_status,
+			result.rotated_fan_count,
+			result.device_kind_count,
 		]
 	else:
 		result_title.add_theme_color_override("font_color", Color("e45e52"))

@@ -156,6 +156,13 @@ func _update_debug() -> void:
 	if current_result == null:
 		debug_last_result = ""
 	elif current_result.succeeded:
-		debug_last_result = "SUCCESS | route=%d | efficient=%s" % [current_result.route.size(), current_result.efficient]
+		debug_last_result = "SUCCESS | %s | route=%d | efficient=%s | turbines=%s | fans_rotated=%d | device_kinds=%d" % [
+			current_result.route_style_label(),
+			current_result.route.size(),
+			current_result.efficient,
+			current_result.all_turbines_powered,
+			current_result.rotated_fan_count,
+			current_result.device_kind_count,
+		]
 	else:
 		debug_last_result = "FAIL | %s | cell=%s | route=%d" % [current_result.failure_label(), current_result.failure_cell, current_result.route.size()]
