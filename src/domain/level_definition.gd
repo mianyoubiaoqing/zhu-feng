@@ -71,6 +71,8 @@ func validate() -> PackedStringArray:
 	for fan in fans:
 		if not contains(fan.cell):
 			errors.append("风机超出地图: %s" % fan.cell)
+		if fan.strength < 1 or fan.strength > WindSolver.MAX_STRENGTH:
+			errors.append("风机风力必须在1到%d之间: %s" % [WindSolver.MAX_STRENGTH, fan.cell])
 	for turbine in turbines:
 		if not contains(turbine.cell):
 			errors.append("涡轮超出地图: %s" % turbine.cell)

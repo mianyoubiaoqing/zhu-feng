@@ -6,14 +6,19 @@ var checks := 0
 
 func _init() -> void:
 	_test_straight_wind()
+	_test_wind_strength_decay()
 	_test_bend()
+	_test_bend_strength_loss()
 	_test_blocker()
 	_test_valve()
 	_test_same_direction_merge()
+	_test_unequal_opposite_wind()
 	_test_opposite_wind_conflict()
+	_test_perpendicular_turbulence()
 	_test_goal_conflict_fails()
 	_test_loop_detection()
 	_test_turbine_door_and_cargo()
+	_test_turbine_strength_threshold()
 	_test_budget_and_undo()
 	_test_ten_run_determinism()
 	print("规则验证完成：%d checks，%d failures" % [checks, failures])
@@ -27,6 +32,14 @@ func _test_straight_wind() -> void:
 	_expect(wind.direction_at(Vector2i(3, 1)) == GameRules.Direction.RIGHT, "直线风传播")
 
 
+func _test_wind_strength_decay() -> void:
+	var level := _level(Vector2i(6, 3))
+	level.fans = [FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT, 6)]
+	var wind := WindSolver.solve(level, {}, {})
+	_expect(wind.strength_at(Vector2i(1, 1)) == 6, "风机相邻格承接完整风力")
+	_expect(wind.strength_at(Vector2i(2, 1)) == 5 and wind.strength_at(Vector2i(5, 1)) == 2, "直线风每格衰减1级")
+
+
 func _test_bend() -> void:
 	var level := _level(Vector2i(4, 4))
 	level.fans = [FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT)]
@@ -34,6 +47,15 @@ func _test_bend() -> void:
 	var wind := WindSolver.solve(level, placements, {})
 	_expect(wind.direction_at(Vector2i(2, 1)) == GameRules.Direction.DOWN, "双向弯管转向")
 	_expect(wind.direction_at(Vector2i(2, 2)) == GameRules.Direction.DOWN, "转向后继续传播")
+
+
+func _test_bend_strength_loss() -> void:
+	var level := _level(Vector2i(5, 4))
+	level.fans = [FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT, 8)]
+	var placements := {Vector2i(2, 1): PlacedDevice.new(GameRules.DeviceKind.BEND, Vector2i(2, 1), GameRules.Direction.DOWN)}
+	var wind := WindSolver.solve(level, placements, {})
+	_expect(wind.strength_at(Vector2i(1, 1)) == 8 and wind.strength_at(Vector2i(2, 1)) == 6, "导风板在逐格衰减外再损失1级")
+	_expect(wind.strength_at(Vector2i(2, 2)) == 5, "转弯后的风继续按格衰减")
 
 
 func _test_blocker() -> void:
@@ -62,6 +84,17 @@ func _test_same_direction_merge() -> void:
 	var wind := WindSolver.solve(level, {}, {})
 	_expect(not wind.is_conflict(Vector2i(3, 1)), "同向风合并而不冲突")
 	_expect(wind.direction_at(Vector2i(4, 1)) == GameRules.Direction.RIGHT, "合并风继续传播")
+	_expect(wind.strength_at(Vector2i(2, 1)) == 11, "同向风力相加并保留精确数值")
+
+
+func _test_unequal_opposite_wind() -> void:
+	var level := _level(Vector2i(3, 3))
+	level.fans = [
+		FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT, 5),
+		FanDefinition.create(Vector2i(2, 1), GameRules.Direction.LEFT, 3),
+	]
+	var wind := WindSolver.solve(level, {}, {})
+	_expect(wind.direction_at(Vector2i(1, 1)) == GameRules.Direction.RIGHT and wind.strength_at(Vector2i(1, 1)) == 2, "强逆风抵消弱逆风后保留差值")
 
 
 func _test_opposite_wind_conflict() -> void:
@@ -73,6 +106,16 @@ func _test_opposite_wind_conflict() -> void:
 	var wind := WindSolver.solve(level, {}, {})
 	_expect(wind.is_conflict(Vector2i(2, 1)), "异向风完全抵消")
 	_expect(wind.direction_at(Vector2i(2, 1)) < 0, "冲突格没有有效方向")
+
+
+func _test_perpendicular_turbulence() -> void:
+	var level := _level(Vector2i(3, 3))
+	level.fans = [
+		FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT, 4),
+		FanDefinition.create(Vector2i(1, 2), GameRules.Direction.UP, 6),
+	]
+	var wind := WindSolver.solve(level, {}, {})
+	_expect(wind.is_conflict(Vector2i(1, 1)) and wind.strength_at(Vector2i(1, 1)) == 10, "垂直风相交形成带强度的乱流")
 
 
 func _test_goal_conflict_fails() -> void:
@@ -89,7 +132,7 @@ func _test_goal_conflict_fails() -> void:
 
 func _test_loop_detection() -> void:
 	var level := _level(Vector2i(4, 4))
-	level.fans = [FanDefinition.create(Vector2i(1, 1), GameRules.Direction.RIGHT)]
+	level.fans = [FanDefinition.create(Vector2i(1, 1), GameRules.Direction.RIGHT, 15)]
 	var placements := {
 		Vector2i(2, 1): PlacedDevice.new(GameRules.DeviceKind.BEND, Vector2i(2, 1), GameRules.Direction.DOWN),
 		Vector2i(2, 2): PlacedDevice.new(GameRules.DeviceKind.BEND, Vector2i(2, 2), GameRules.Direction.LEFT),
@@ -112,6 +155,18 @@ func _test_turbine_door_and_cargo() -> void:
 	var result := CargoSimulator.simulate(level, wind, 4)
 	_expect(wind.is_turbine_powered(&"t1"), "涡轮在风场阶段供能")
 	_expect(result.succeeded, "供能后风种穿门抵达终点")
+	_expect(result.route_strengths.size() == result.route.size() and result.route_strengths[0] > result.route_strengths[-1], "模拟结果记录沿途风力供移动表现使用")
+
+
+func _test_turbine_strength_threshold() -> void:
+	var level := _level(Vector2i(4, 3))
+	level.turbines = [TurbineDefinition.create(&"weak", Vector2i(1, 1))]
+	level.fans = [FanDefinition.create(Vector2i(0, 1), GameRules.Direction.RIGHT, 2)]
+	var powered := WindSolver.solve(level, {}, {})
+	_expect(powered.is_turbine_powered(&"weak") and powered.strength_at(Vector2i(1, 1)) == 1, "2级风可驱动涡轮并被吸收1级")
+	level.fans[0].strength = 1
+	var weak := WindSolver.solve(level, {}, {})
+	_expect(not weak.is_turbine_powered(&"weak"), "1级风无法驱动涡轮")
 
 
 func _test_budget_and_undo() -> void:
@@ -139,8 +194,9 @@ func _test_ten_run_determinism() -> void:
 	for run_index in 10:
 		var wind := WindSolver.solve(level, placements, {})
 		var simulation := CargoSimulator.simulate(level, wind, 4)
-		var fingerprint := "%s|%s|%s|%s" % [
+		var fingerprint := "%s|%s|%s|%s|%s" % [
 			wind.directions_by_cell,
+			wind.strength_by_cell,
 			wind.conflict_cells,
 			wind.loop_cells,
 			simulation.route,

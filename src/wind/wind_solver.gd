@@ -1,64 +1,103 @@
 class_name WindSolver
 extends RefCounted
 
-## Interface: solve one immutable level/build snapshot and return all observable wind facts.
-## The result is deterministic, has no Node dependencies, and performs no side effects.
+const MAX_STRENGTH := 15
+const DEFAULT_FAN_STRENGTH := 6
+const BEND_STRENGTH_LOSS := 1
+const TURBINE_MIN_STRENGTH := 2
+const TURBINE_STRENGTH_LOSS := 1
+
+
+## Solve a stable, discrete wind field. Every cell stores one outgoing wind
+## direction and strength, or a turbulence state when perpendicular/equal
+## opposing winds meet. The iteration order and stopping rules are deterministic.
 static func solve(level: LevelDefinition, placements: Dictionary, fan_directions: Dictionary) -> WindSolution:
-	var raw_paths: Array = []
+	var states: Dictionary = {}
+	var seen_signatures: Dictionary = {}
+	var iteration_limit := maxi(32, level.size.x * level.size.y * MAX_STRENGTH * 2)
+	for _iteration in iteration_limit:
+		var next_states: Dictionary = {}
+		for y in level.size.y:
+			for x in level.size.x:
+				var cell := Vector2i(x, y)
+				if level.is_wall(cell):
+					continue
+				var state := _solve_cell(level, placements, fan_directions, states, cell)
+				if not state.is_empty():
+					next_states[cell] = state
+		if _states_equal(states, next_states):
+			states = next_states
+			break
+		var signature := _state_signature(level, next_states)
+		if seen_signatures.has(signature):
+			states = next_states
+			break
+		seen_signatures[signature] = true
+		states = next_states
+
+	return _build_solution(level, states, fan_directions)
+
+
+static func _solve_cell(
+	level: LevelDefinition,
+	placements: Dictionary,
+	fan_directions: Dictionary,
+	previous_states: Dictionary,
+	cell: Vector2i
+) -> Dictionary:
+	var incoming: Array[int] = [0, 0, 0, 0]
 	for fan in level.fans:
-		var direction: int = fan_directions.get(fan.cell, fan.direction)
-		raw_paths.append(_trace_path(level, placements, fan.cell, direction))
+		if fan.cell == cell:
+			var fan_direction: int = fan_directions.get(fan.cell, fan.direction)
+			incoming[wrapi(fan_direction, 0, 4)] += fan.strength
 
-	var active_lengths: Array[int] = []
-	for path in raw_paths:
-		active_lengths.append(path.entries.size())
+	for direction in 4:
+		var upstream_cell := cell - GameRules.vector(direction)
+		var upstream: Dictionary = previous_states.get(upstream_cell, {})
+		if upstream.is_empty() or bool(upstream.get("conflict", false)):
+			continue
+		if int(upstream.get("direction", -1)) != direction:
+			continue
+		var strength := int(upstream.get("strength", 0))
+		if level.fan_at(upstream_cell) == null:
+			strength -= 1
+		if strength > 0:
+			incoming[direction] += strength
 
-	var conflicts := _truncate_at_conflicts(raw_paths, active_lengths)
-	var solution := WindSolution.new()
-	solution.conflict_cells = conflicts
+	# A fixed fan is a source boundary: tailwind can reinforce it, while wind
+	# arriving from another direction cannot turn or stall the machine itself.
+	var fan := level.fan_at(cell)
+	if fan != null:
+		var forced_direction: int = fan_directions.get(cell, fan.direction)
+		var forced_strength := incoming[wrapi(forced_direction, 0, 4)]
+		incoming = [0, 0, 0, 0]
+		incoming[wrapi(forced_direction, 0, 4)] = forced_strength
 
-	for path_index in raw_paths.size():
-		var path = raw_paths[path_index]
-		var visible_entries: Array = path.entries.slice(0, active_lengths[path_index])
-		solution.paths.append(visible_entries)
-		for entry in visible_entries:
-			_add_direction(solution.directions_by_cell, entry.cell, entry.direction)
-		if path.loop_start >= 0 and path.loop_start < active_lengths[path_index]:
-			for entry_index in range(path.loop_start, active_lengths[path_index]):
-				solution.loop_cells[visible_entries[entry_index].cell] = true
+	var transformed: Array[int] = [0, 0, 0, 0]
+	var device: PlacedDevice = placements.get(cell)
+	for direction in 4:
+		var strength := mini(incoming[direction], MAX_STRENGTH)
+		if strength <= 0:
+			continue
+		var output_direction := direction
+		if device != null:
+			output_direction = _transform_direction(device, direction)
+			if output_direction < 0:
+				continue
+			if device.kind == GameRules.DeviceKind.BEND:
+				strength -= BEND_STRENGTH_LOSS
+		if strength > 0:
+			transformed[output_direction] = mini(MAX_STRENGTH, transformed[output_direction] + strength)
 
-	for turbine in level.turbines:
-		if solution.has_wind(turbine.cell) and not solution.is_conflict(turbine.cell) and not solution.is_loop(turbine.cell):
-			solution.powered_turbine_ids[turbine.id] = true
-	return solution
+	var resolved := _resolve_directions(transformed)
+	if resolved.is_empty() or bool(resolved.get("conflict", false)):
+		return resolved
 
-
-static func _trace_path(level: LevelDefinition, placements: Dictionary, start: Vector2i, initial_direction: int) -> Dictionary:
-	var entries: Array = []
-	var visited: Dictionary = {}
-	var cell := start
-	var direction := initial_direction
-	var loop_start := -1
-	var safety_limit: int = maxi(8, level.size.x * level.size.y * 4 + 1)
-
-	for _step in safety_limit:
-		if not level.contains(cell) or level.is_wall(cell):
-			break
-		if cell != start:
-			var device: PlacedDevice = placements.get(cell)
-			if device != null:
-				direction = _transform_direction(device, direction)
-				if direction < 0:
-					break
-		var state := Vector3i(cell.x, cell.y, direction)
-		if visited.has(state):
-			loop_start = visited[state]
-			break
-		visited[state] = entries.size()
-		entries.append({"cell": cell, "direction": direction})
-		cell += GameRules.vector(direction)
-
-	return {"entries": entries, "loop_start": loop_start}
+	var turbine := level.turbine_at(cell)
+	if turbine != null and int(resolved.strength) >= TURBINE_MIN_STRENGTH:
+		resolved.powered = true
+		resolved.strength = maxi(1, int(resolved.strength) - TURBINE_STRENGTH_LOSS)
+	return resolved
 
 
 static func _transform_direction(device: PlacedDevice, incoming_direction: int) -> int:
@@ -78,62 +117,109 @@ static func _transform_direction(device: PlacedDevice, incoming_direction: int) 
 	return -1
 
 
-static func _truncate_at_conflicts(paths: Array, active_lengths: Array[int]) -> Dictionary:
-	var conflicts: Dictionary = {}
-	while true:
-		var current_conflicts: Dictionary = {}
-		for first_path_index in paths.size():
-			for second_path_index in range(first_path_index + 1, paths.size()):
-				var collision_cell := _find_pair_collision(
-					paths[first_path_index].entries,
-					active_lengths[first_path_index],
-					paths[second_path_index].entries,
-					active_lengths[second_path_index]
-				)
-				if collision_cell != Vector2i(-1, -1):
-					current_conflicts[collision_cell] = true
-
-		var changed := false
-		for path_index in paths.size():
-			var entries: Array = paths[path_index].entries
-			for entry_index in active_lengths[path_index]:
-				if current_conflicts.has(entries[entry_index].cell):
-					var new_length := entry_index + 1
-					if new_length < active_lengths[path_index]:
-						active_lengths[path_index] = new_length
-						changed = true
-					break
-		conflicts = current_conflicts
-		if not changed:
-			return conflicts
-	return conflicts
+static func _resolve_directions(strengths: Array[int]) -> Dictionary:
+	var horizontal := strengths[GameRules.Direction.RIGHT] - strengths[GameRules.Direction.LEFT]
+	var vertical := strengths[GameRules.Direction.DOWN] - strengths[GameRules.Direction.UP]
+	var has_horizontal := strengths[GameRules.Direction.RIGHT] > 0 or strengths[GameRules.Direction.LEFT] > 0
+	var has_vertical := strengths[GameRules.Direction.DOWN] > 0 or strengths[GameRules.Direction.UP] > 0
+	var total := mini(MAX_STRENGTH, strengths.reduce(func(sum: int, value: int) -> int: return sum + value, 0))
+	if has_horizontal and has_vertical:
+		return {"direction": -1, "strength": 0, "conflict": true, "conflict_strength": total}
+	if has_horizontal:
+		if horizontal == 0:
+			return {"direction": -1, "strength": 0, "conflict": true, "conflict_strength": total}
+		return {
+			"direction": GameRules.Direction.RIGHT if horizontal > 0 else GameRules.Direction.LEFT,
+			"strength": mini(MAX_STRENGTH, absi(horizontal)),
+			"conflict": false,
+		}
+	if has_vertical:
+		if vertical == 0:
+			return {"direction": -1, "strength": 0, "conflict": true, "conflict_strength": total}
+		return {
+			"direction": GameRules.Direction.DOWN if vertical > 0 else GameRules.Direction.UP,
+			"strength": mini(MAX_STRENGTH, absi(vertical)),
+			"conflict": false,
+		}
+	return {}
 
 
-## Wind fronts advance one grid cell per logical step. When two paths overlap in
-## opposite directions, their collision is the shared cell both fronts can reach
-## earliest, rather than every cell in the overlapping corridor.
-static func _find_pair_collision(first_entries: Array, first_length: int, second_entries: Array, second_length: int) -> Vector2i:
-	var best_cell := Vector2i(-1, -1)
-	var best_time := 2147483647
-	var best_total_distance := 2147483647
-	for first_index in first_length:
-		var first_entry = first_entries[first_index]
-		for second_index in second_length:
-			var second_entry = second_entries[second_index]
-			if first_entry.cell != second_entry.cell or first_entry.direction == second_entry.direction:
+static func _build_solution(level: LevelDefinition, states: Dictionary, fan_directions: Dictionary) -> WindSolution:
+	var solution := WindSolution.new()
+	for y in level.size.y:
+		for x in level.size.x:
+			var cell := Vector2i(x, y)
+			var state: Dictionary = states.get(cell, {})
+			if state.is_empty():
 				continue
-			var arrival_time: int = maxi(first_index, second_index)
-			var total_distance: int = first_index + second_index
-			if arrival_time < best_time or (arrival_time == best_time and total_distance < best_total_distance):
-				best_cell = first_entry.cell
-				best_time = arrival_time
-				best_total_distance = total_distance
-	return best_cell
+			if bool(state.get("conflict", false)):
+				solution.conflict_cells[cell] = true
+				solution.conflict_strength_by_cell[cell] = int(state.get("conflict_strength", 0))
+				continue
+			var direction := int(state.direction)
+			solution.directions_by_cell[cell] = [direction]
+			solution.strength_by_cell[cell] = int(state.strength)
+			var turbine := level.turbine_at(cell)
+			if turbine != null and bool(state.get("powered", false)):
+				solution.powered_turbine_ids[turbine.id] = true
+
+	_detect_loops(level, states, solution)
+	for fan in level.fans:
+		var entries: Array = []
+		var current := fan.cell
+		var visited: Dictionary = {}
+		while level.contains(current) and states.has(current) and not visited.has(current):
+			visited[current] = true
+			var state: Dictionary = states[current]
+			if bool(state.get("conflict", false)):
+				break
+			entries.append({"cell": current, "direction": int(state.direction), "strength": int(state.strength)})
+			current += GameRules.vector(int(state.direction))
+		solution.paths.append(entries)
+	return solution
 
 
-static func _add_direction(target: Dictionary, cell: Vector2i, direction: int) -> void:
-	if not target.has(cell):
-		target[cell] = []
-	var directions: Array = target[cell]
-	if direction not in directions:
-		directions.append(direction)
+static func _detect_loops(level: LevelDefinition, states: Dictionary, solution: WindSolution) -> void:
+	for origin in states:
+		var path: Array[Vector2i] = []
+		var index_by_cell: Dictionary = {}
+		var current: Vector2i = origin
+		while level.contains(current) and states.has(current):
+			var state: Dictionary = states[current]
+			if bool(state.get("conflict", false)):
+				break
+			if index_by_cell.has(current):
+				for index in range(int(index_by_cell[current]), path.size()):
+					solution.loop_cells[path[index]] = true
+				break
+			index_by_cell[current] = path.size()
+			path.append(current)
+			current += GameRules.vector(int(state.direction))
+
+
+static func _states_equal(first: Dictionary, second: Dictionary) -> bool:
+	if first.size() != second.size():
+		return false
+	for cell in first:
+		if not second.has(cell):
+			return false
+		var a: Dictionary = first[cell]
+		var b: Dictionary = second[cell]
+		for key in ["direction", "strength", "conflict", "conflict_strength", "powered"]:
+			if a.get(key) != b.get(key):
+				return false
+	return true
+
+
+static func _state_signature(level: LevelDefinition, states: Dictionary) -> String:
+	var parts := PackedStringArray()
+	for y in level.size.y:
+		for x in level.size.x:
+			var state: Dictionary = states.get(Vector2i(x, y), {})
+			parts.append("%d:%d:%d:%d" % [
+				int(state.get("direction", -2)),
+				int(state.get("strength", 0)),
+				int(bool(state.get("conflict", false))),
+				int(bool(state.get("powered", false))),
+			])
+	return "|".join(parts)

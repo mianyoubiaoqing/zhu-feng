@@ -45,9 +45,13 @@ func _run() -> void:
 	_expect(editor.apply_tool_at(Vector2i(5, 2)), "涡轮工具可绘制联动机关")
 	editor.select_tool(LevelEditor.Tool.DOOR)
 	_expect(editor.apply_tool_at(Vector2i(6, 2)), "门工具可引用联动 ID")
+	(editor_root.get_node("RightPanel/FanStrengthSpin") as SpinBox).value = 12
+	editor.select_tool(LevelEditor.Tool.FAN)
+	_expect(editor.apply_tool_at(Vector2i(7, 2)), "风机工具可绘制指定风力")
 	var built := editor.level_definition()
 	_expect(built.walls.has(Vector2i(3, 2)) and built.pits.has(Vector2i(4, 2)), "地形写入 LevelDefinition")
 	_expect(built.turbines.size() == 1 and built.doors.size() == 1 and built.required_turbine_ids.has(&"switch_a"), "机关联动与通关条件写入 LevelDefinition")
+	_expect(built.fan_at(Vector2i(7, 2)).strength == 12, "风力级别写入新风机定义")
 	_expect(built.validate().is_empty(), "绘制后的关卡通过结构校验")
 	_expect(game_flow.call("set_custom_level", built) as bool, "自定义关卡可交给试玩流程")
 	var selected := game_flow.call("selected_level") as LevelDefinition
@@ -80,7 +84,7 @@ func _test_codec_round_trip() -> void:
 	var restored := LevelCodec.from_json(json)
 	_expect(not json.is_empty() and restored != null, "关卡可编码并解码 JSON")
 	_expect(restored.size == source.size and restored.start == source.start and restored.goal == source.goal, "JSON 保留画布与起终点")
-	_expect(restored.fans.size() == source.fans.size() and restored.fans[0].direction == source.fans[0].direction, "JSON 保留风机位置与方向")
+	_expect(restored.fans.size() == source.fans.size() and restored.fans[0].direction == source.fans[0].direction and restored.fans[0].strength == source.fans[0].strength, "JSON 保留风机位置、方向与风力")
 	_expect(restored.turbines.size() == source.turbines.size() and restored.doors.size() == source.doors.size(), "JSON 保留涡轮与门")
 	_expect(restored.validate().is_empty(), "JSON 往返后的关卡仍可加载")
 

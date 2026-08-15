@@ -15,6 +15,7 @@ signal animation_finished(result: SimulationResult)
 @export var debug_route_length := 0
 @export var debug_route_index := 0
 @export var debug_step_progress := 0.0
+@export var debug_current_wind_strength := 0
 @export var debug_logical_cell := Vector2i(-1, -1)
 @export var debug_loaded_art_assets := 0
 @export_multiline var debug_outcome := ""
@@ -45,6 +46,7 @@ func play_result(result: SimulationResult) -> void:
 	debug_route_length = result.route.size()
 	debug_route_index = 0
 	debug_step_progress = 0.0
+	debug_current_wind_strength = result.route_strengths[0] if not result.route_strengths.is_empty() else 0
 	_route_time = 0.0
 	debug_animating = result.route.size() > 1
 	debug_logical_cell = result.route[0] if not result.route.is_empty() else Vector2i(-1, -1)
@@ -61,6 +63,7 @@ func reset_to(cell: Vector2i) -> void:
 	debug_route_length = 0
 	debug_route_index = 0
 	debug_step_progress = 0.0
+	debug_current_wind_strength = 0
 	debug_logical_cell = cell
 	debug_outcome = ""
 	position = cell_center(cell)
@@ -81,7 +84,8 @@ func _process(delta: float) -> void:
 	if not debug_animating or _result == null:
 		return
 	_route_time += delta
-	debug_step_progress = minf(_route_time / step_duration, 1.0)
+	var current_duration := _current_step_duration()
+	debug_step_progress = minf(_route_time / current_duration, 1.0)
 	var eased_progress := smoothstep(0.0, 1.0, debug_step_progress)
 	_motion_direction = Vector2(_result.route[debug_route_index + 1] - _result.route[debug_route_index]).normalized()
 	position = cell_center(_result.route[debug_route_index]).lerp(
@@ -91,10 +95,23 @@ func _process(delta: float) -> void:
 	if debug_step_progress >= 1.0:
 		debug_route_index += 1
 		debug_logical_cell = _result.route[debug_route_index]
+		debug_current_wind_strength = _route_strength_at(debug_route_index)
 		_route_time = 0.0
 		debug_step_progress = 0.0
 		if debug_route_index >= _result.route.size() - 1:
 			_finish_animation()
+
+
+func _route_strength_at(index: int) -> int:
+	if _result == null or index < 0 or index >= _result.route_strengths.size():
+		return 0
+	return _result.route_strengths[index]
+
+
+func _current_step_duration() -> float:
+	var strength := clampi(_route_strength_at(debug_route_index), 1, WindSolver.MAX_STRENGTH)
+	var force_ratio := inverse_lerp(1.0, float(WindSolver.MAX_STRENGTH), float(strength))
+	return step_duration * lerpf(1.35, 0.65, force_ratio)
 
 
 func _finish_animation() -> void:
@@ -107,11 +124,12 @@ func _finish_animation() -> void:
 
 func _draw() -> void:
 	var pulse := 0.5 + 0.5 * sin(_visual_time * 4.0)
+	var force_ratio := inverse_lerp(1.0, float(WindSolver.MAX_STRENGTH), float(clampi(debug_current_wind_strength, 1, WindSolver.MAX_STRENGTH)))
 	var tail_direction := -_motion_direction
 	for index in 3:
-		var distance := cargo_radius * (0.85 + float(index) * 0.58)
-		var tail_radius := cargo_radius * (0.42 - float(index) * 0.09)
-		draw_circle(tail_direction * distance, tail_radius, Color(0.22, 0.78, 0.82, 0.34 - float(index) * 0.08))
+		var distance := cargo_radius * (0.85 + float(index) * lerpf(0.42, 0.72, force_ratio))
+		var tail_radius := cargo_radius * (0.42 - float(index) * 0.09 + force_ratio * 0.08)
+		draw_circle(tail_direction * distance, tail_radius, Color(0.22, 0.78, 0.82, 0.24 + force_ratio * 0.20 - float(index) * 0.06))
 	draw_circle(Vector2.ZERO, cargo_radius * (1.35 + pulse * 0.08), Color(0.98, 0.73, 0.24, 0.14 + pulse * 0.08))
 	if cargo_texture != null:
 		var rotation := _motion_direction.angle() - PI / 4.0

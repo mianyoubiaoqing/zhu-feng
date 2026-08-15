@@ -6,6 +6,7 @@ extends RefCounted
 static func simulate(level: LevelDefinition, wind: WindSolution, spent_budget: int) -> SimulationResult:
 	var result := SimulationResult.new()
 	result.route.append(level.start)
+	result.route_strengths.append(wind.strength_at(level.start))
 	result.powered_turbine_ids.assign(wind.powered_turbine_ids.keys())
 	var current := level.start
 	var visited_states: Dictionary = {}
@@ -34,12 +35,14 @@ static func simulate(level: LevelDefinition, wind: WindSolution, spent_budget: i
 			return _fail(result, GameRules.FailureReason.COLLISION, current)
 		if level.is_pit(next):
 			result.route.append(next)
+			result.route_strengths.append(wind.strength_at(next))
 			return _fail(result, GameRules.FailureReason.PIT, next)
 		var door := level.door_at(next)
 		if door != null and not wind.is_turbine_powered(door.turbine_id):
 			return _fail(result, GameRules.FailureReason.COLLISION, current)
 		current = next
 		result.route.append(current)
+		result.route_strengths.append(wind.strength_at(current))
 
 	return _fail(result, GameRules.FailureReason.STEP_LIMIT, current)
 

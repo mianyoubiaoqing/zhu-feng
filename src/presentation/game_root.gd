@@ -88,8 +88,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if not session.is_initialized() or not runtime_label.visible:
 		return
-	runtime_label.text = "Remote Inspector：Session / BuildController / BoardView / CargoView / AudioDirector\n风格 %d · 冲突 %d · 闭环 %d · 路线步 %d · 美术 %d/41 · 音频 %d/15" % [
+	runtime_label.text = "Remote Inspector：Session / BuildController / BoardView / CargoView / AudioDirector\n风格 %d · 峰值风力 %d · 冲突 %d · 闭环 %d · 路线步 %d · 美术 %d/46 · 音频 %d/15" % [
 		session.debug_wind_cell_count,
+		session.debug_peak_wind_strength,
 		session.debug_conflict_count,
 		session.debug_loop_cell_count,
 		cargo_view.debug_route_index,

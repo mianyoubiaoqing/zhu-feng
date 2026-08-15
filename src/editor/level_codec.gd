@@ -5,7 +5,7 @@ extends RefCounted
 static func to_dictionary(level: LevelDefinition) -> Dictionary:
 	var fans: Array[Dictionary] = []
 	for fan in level.fans:
-		fans.append({"cell": _cell_to_array(fan.cell), "direction": fan.direction})
+		fans.append({"cell": _cell_to_array(fan.cell), "direction": fan.direction, "strength": fan.strength})
 	var turbines: Array[Dictionary] = []
 	for turbine in level.turbines:
 		turbines.append({"id": String(turbine.id), "cell": _cell_to_array(turbine.cell)})
@@ -51,7 +51,8 @@ static func from_dictionary(data: Dictionary) -> LevelDefinition:
 	for entry in _dictionary_array(data.get("fans", [])):
 		fans.append(FanDefinition.create(
 			_array_to_cell(entry.get("cell"), Vector2i.ZERO),
-			wrapi(int(entry.get("direction", GameRules.Direction.RIGHT)), 0, 4)
+			wrapi(int(entry.get("direction", GameRules.Direction.RIGHT)), 0, 4),
+			clampi(int(entry.get("strength", 6)), 1, WindSolver.MAX_STRENGTH)
 		))
 	level.fans = fans
 	var turbines: Array[TurbineDefinition] = []

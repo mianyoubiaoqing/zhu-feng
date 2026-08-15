@@ -2,6 +2,8 @@ class_name WindSolution
 extends RefCounted
 
 var directions_by_cell: Dictionary = {}
+var strength_by_cell: Dictionary = {}
+var conflict_strength_by_cell: Dictionary = {}
 var conflict_cells: Dictionary = {}
 var loop_cells: Dictionary = {}
 var powered_turbine_ids: Dictionary = {}
@@ -17,8 +19,14 @@ func direction_at(cell: Vector2i) -> int:
 	return directions[0]
 
 
+func strength_at(cell: Vector2i) -> int:
+	if conflict_cells.has(cell):
+		return int(conflict_strength_by_cell.get(cell, 0))
+	return int(strength_by_cell.get(cell, 0))
+
+
 func has_wind(cell: Vector2i) -> bool:
-	return directions_by_cell.has(cell)
+	return directions_by_cell.has(cell) or conflict_cells.has(cell)
 
 
 func is_conflict(cell: Vector2i) -> bool:
@@ -34,4 +42,8 @@ func is_turbine_powered(turbine_id: StringName) -> bool:
 
 
 func cells() -> Array:
-	return directions_by_cell.keys()
+	var result := directions_by_cell.keys()
+	for cell in conflict_cells:
+		if cell not in result:
+			result.append(cell)
+	return result

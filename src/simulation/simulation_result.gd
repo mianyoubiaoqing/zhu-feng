@@ -6,6 +6,7 @@ var efficient := false
 var failure_reason: int = GameRules.FailureReason.NONE
 var failure_cell: Vector2i = Vector2i(-1, -1)
 var route: Array[Vector2i] = []
+var route_strengths: Array[int] = []
 var powered_turbine_ids: Array[StringName] = []
 var all_turbines_powered := false
 var rotated_fan_count := 0

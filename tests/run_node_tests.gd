@@ -24,6 +24,7 @@ func _run() -> void:
 	var audio_director := root.get_node("AudioDirector") as AudioDirector
 	_expect(session != null and build_controller != null and board_view != null and cargo_view != null and audio_director != null, "调试节点全部实例化")
 	_expect(session.is_initialized() and session.debug_phase == "BUILD", "Session节点初始化并暴露建造阶段")
+	_expect(session.debug_peak_wind_strength == 15, "Session节点暴露当前风场峰值风力")
 	_expect(is_equal_approx(board_view.cell_size, cargo_view.cell_size) and board_view.board_origin.is_equal_approx(cargo_view.board_origin), "棋盘与风种共享自适应坐标")
 	_expect(board_view.cell_size >= 88.0 and board_view.cell_size <= 140.0, "六关棋盘尺寸保持在可读范围")
 	_expect(board_view.debug_loaded_art_assets == 38, "BoardView绑定新增风机、挡风板和门状态图片")
@@ -68,6 +69,7 @@ func _run() -> void:
 
 	var result := session.start_test()
 	_expect(session.debug_phase == "RESULT" and not session.debug_last_result.is_empty(), "测试结果写入Session调试字段")
+	_expect(result.route_strengths.size() == result.route.size(), "风种路线为每一步携带风力数据")
 	cargo_view.step_duration = 0.01
 	cargo_view.play_result(result)
 	var animation_frames := 0

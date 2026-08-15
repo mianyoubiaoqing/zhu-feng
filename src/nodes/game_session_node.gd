@@ -16,6 +16,7 @@ signal result_ready(result: SimulationResult)
 @export var debug_remaining_budget := 0
 @export var debug_device_count := 0
 @export var debug_wind_cell_count := 0
+@export var debug_peak_wind_strength := 0
 @export var debug_conflict_count := 0
 @export var debug_loop_cell_count := 0
 @export var debug_powered_turbines := PackedStringArray()
@@ -147,6 +148,10 @@ func _update_debug() -> void:
 	debug_remaining_budget = _session.remaining_budget()
 	debug_device_count = _session.devices().size()
 	debug_wind_cell_count = current_wind.cells().size() if current_wind != null else 0
+	debug_peak_wind_strength = 0
+	if current_wind != null:
+		for cell in current_wind.cells():
+			debug_peak_wind_strength = maxi(debug_peak_wind_strength, current_wind.strength_at(cell))
 	debug_conflict_count = current_wind.conflict_cells.size() if current_wind != null else 0
 	debug_loop_cell_count = current_wind.loop_cells.size() if current_wind != null else 0
 	debug_powered_turbines.clear()

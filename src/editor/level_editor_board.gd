@@ -83,7 +83,7 @@ func _draw_cell(cell: Vector2i) -> void:
 		_draw_badge(rect, "终", Color("d89f2b"))
 	var fan := _level.fan_at(cell)
 	if fan != null:
-		_draw_fan(rect, fan.direction)
+		_draw_fan(rect, fan.direction, fan.strength)
 	var turbine := _level.turbine_at(cell)
 	if turbine != null:
 		_draw_machine(rect, "涡", String(turbine.id), Color("36a6a6"))
@@ -116,7 +116,7 @@ func _draw_badge(rect: Rect2, label: String, color: Color) -> void:
 	_draw_centered_text(rect, label, color, maxi(18, floori(rect.size.x * 0.27)))
 
 
-func _draw_fan(rect: Rect2, direction: int) -> void:
+func _draw_fan(rect: Rect2, direction: int, strength: int) -> void:
 	var center := rect.get_center()
 	if wind_fan_body_texture != null and wind_fan_blades_texture != null:
 		_draw_texture_in_rect(wind_fan_body_texture, rect, 0.76)
@@ -127,6 +127,7 @@ func _draw_fan(rect: Rect2, direction: int) -> void:
 		draw_line(from, to, Color("e45e52"), 4.0)
 		var side := vector.rotated(PI * 0.5)
 		draw_colored_polygon(PackedVector2Array([to, to - vector * 9.0 + side * 6.0, to - vector * 9.0 - side * 6.0]), Color("e45e52"))
+		_draw_corner_value(rect, strength)
 		return
 	draw_circle(center, rect.size.x * 0.27, Color("fff9e5"))
 	draw_circle(center, rect.size.x * 0.27, Color("40545a"), false, 3.0)
@@ -140,6 +141,16 @@ func _draw_fan(rect: Rect2, direction: int) -> void:
 	draw_line(from, to, Color("e45e52"), 4.0)
 	var side := vector.rotated(PI * 0.5)
 	draw_colored_polygon(PackedVector2Array([to, to - vector * 9.0 + side * 6.0, to - vector * 9.0 - side * 6.0]), Color("e45e52"))
+	_draw_corner_value(rect, strength)
+
+
+func _draw_corner_value(rect: Rect2, value: int) -> void:
+	var radius := maxf(9.0, rect.size.x * 0.13)
+	var center := rect.position + Vector2(rect.size.x - radius - 3.0, radius + 3.0)
+	draw_circle(center, radius, Color(1.0, 0.98, 0.91, 0.96))
+	draw_circle(center, radius, Color("299083"), false, 2.0)
+	var value_rect := Rect2(center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0)
+	_draw_centered_text(value_rect, str(value), Color("20343b"), maxi(11, floori(rect.size.x * 0.15)))
 
 
 func _draw_machine(rect: Rect2, symbol: String, link_id: String, color: Color) -> void:

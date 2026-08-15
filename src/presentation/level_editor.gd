@@ -23,6 +23,7 @@ const LEVEL_SELECT_SCENE := "res://scenes/level_select.tscn"
 @onready var _budget_spin: SpinBox = $RightPanel/BudgetSpin
 @onready var _efficient_spin: SpinBox = $RightPanel/EfficientSpin
 @onready var _direction_option: OptionButton = $RightPanel/DirectionOption
+@onready var _fan_strength_spin: SpinBox = $RightPanel/FanStrengthSpin
 @onready var _link_edit: LineEdit = $RightPanel/LinkEdit
 @onready var _required_toggle: CheckBox = $RightPanel/RequiredToggle
 @onready var _status: Label = $Status
@@ -176,7 +177,7 @@ func _place_fan(cell: Vector2i) -> bool:
 	if not _can_place_object(cell):
 		return false
 	_clear_everything_at(cell)
-	_level.fans.append(FanDefinition.create(cell, _direction_option.selected))
+	_level.fans.append(FanDefinition.create(cell, _direction_option.selected, int(_fan_strength_spin.value)))
 	return true
 
 
@@ -423,7 +424,7 @@ func _make_default_level() -> LevelDefinition:
 	level.efficient_budget = 6
 	level.start = Vector2i(1, 3)
 	level.goal = Vector2i(8, 3)
-	level.fans = [FanDefinition.create(Vector2i(0, 3), GameRules.Direction.RIGHT)]
+	level.fans = [FanDefinition.create(Vector2i(0, 3), GameRules.Direction.RIGHT, 6)]
 	return level
 
 

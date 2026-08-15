@@ -17,6 +17,7 @@ func _run() -> void:
 		ids[level.level_id] = true
 	_expect(ids.size() == levels.size(), "关卡ID互不重复")
 	_expect(levels[0].budget == 2 and levels[0].efficient_budget == 0, "第一关提供2金币且无装置仍为精简解")
+	_expect([levels[0].fans[0].strength, levels[1].fans[0].strength, levels[2].fans[0].strength, levels[4].fans[0].strength, levels[5].fans[0].strength] == [6, 9, 13, 11, 15], "关卡风力随路线长度分级配置")
 	_test_first_level_device_trial(levels[0])
 
 	for index in levels.size():

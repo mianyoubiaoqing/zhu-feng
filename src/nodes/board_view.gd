@@ -176,13 +176,15 @@ func _draw() -> void:
 			if wind.is_conflict(cell):
 				var conflict_pulse := 0.68 + 0.18 * sin(_wind_phase * TAU * 2.0)
 				_draw_cell_texture(conflict_texture, cell, 0.72 + conflict_pulse * 0.08, Color(1, 1, 1, conflict_pulse))
+				_draw_strength_badge(cell, wind.strength_at(cell), Color("e45e52"))
 			elif wind.is_loop(cell):
 				_draw_cell_texture(closed_loop_texture, cell, 0.72)
+				_draw_strength_badge(cell, wind.strength_at(cell), Color("d89f2b"))
 			else:
-				_draw_wind_track(cell, wind.direction_at(cell))
+				_draw_wind_track(cell, wind.direction_at(cell), wind.strength_at(cell))
 
 	for fan in level.fans:
-		_draw_fan(fan.cell, _session.fan_direction(fan.cell))
+		_draw_fan(fan.cell, _session.fan_direction(fan.cell), fan.strength)
 	for turbine in level.turbines:
 		var powered := wind != null and wind.is_turbine_powered(turbine.id)
 		_draw_turbine(turbine.cell, powered)
@@ -249,17 +251,19 @@ func _draw_wall(level: LevelDefinition, cell: Vector2i) -> void:
 		draw_rect(_cell_rect(cell), Color("607178"), true)
 
 
-func _draw_fan(cell: Vector2i, direction: int) -> void:
+func _draw_fan(cell: Vector2i, direction: int, strength: int) -> void:
 	var blades := wind_fan_blades_blue_texture if wind_fan_blades_blue_texture != null else wind_fan_blades_texture
 	if wind_fan_body_texture != null and blades != null:
 		_draw_cell_texture(wind_fan_body_texture, cell, 0.86)
 		_draw_rotated_cell_texture(blades, cell, _fan_spin, 0.72)
 		_draw_cell_texture(_direction_texture(direction), cell, 0.46, Color(1, 1, 1, 0.82))
+		_draw_strength_badge(cell, strength, Color("299083"))
 		return
 	var center := cell_center(cell)
 	draw_circle(center, 31.0, Color("d7ebe7"))
 	draw_circle(center, 31.0, Color("2d7f78"), false, 3.0)
 	_draw_arrow(center, direction, Color("20343b"), 27.0)
+	_draw_strength_badge(cell, strength, Color("299083"))
 
 
 func _draw_turbine(cell: Vector2i, powered: bool) -> void:
@@ -274,7 +278,8 @@ func _draw_turbine(cell: Vector2i, powered: bool) -> void:
 	_draw_token(cell, "涡", Color("f2cf63") if powered else Color("cfbf86"))
 
 
-func _draw_wind_track(cell: Vector2i, direction: int) -> void:
+func _draw_wind_track(cell: Vector2i, direction: int, strength: int) -> void:
+	var force_ratio := inverse_lerp(1.0, float(WindSolver.MAX_STRENGTH), float(clampi(strength, 1, WindSolver.MAX_STRENGTH)))
 	var device := _session.device_at(cell)
 	if device != null and device.kind == GameRules.DeviceKind.BEND and track_bend_texture != null:
 		var bend_rotation := float(wrapi(device.orientation - GameRules.Direction.LEFT, 0, 4)) * PI / 2.0
@@ -285,18 +290,19 @@ func _draw_wind_track(cell: Vector2i, direction: int) -> void:
 	if track_arrow_texture != null:
 		var arrow_rotation := float(direction - GameRules.Direction.RIGHT) * PI / 2.0
 		var cell_offset := fposmod(float(cell.x * 7 + cell.y * 11) * 0.11, 1.0)
-		var travel := fposmod(_wind_phase + cell_offset, 1.0) - 0.5
+		var travel := fposmod(_wind_phase * lerpf(0.65, 1.45, force_ratio) + cell_offset, 1.0) - 0.5
 		var direction_vector := Vector2(GameRules.vector(direction))
-		var alpha := 0.68 + 0.22 * sin((_wind_phase + cell_offset) * TAU)
+		var alpha := 0.48 + force_ratio * 0.30 + 0.16 * sin((_wind_phase + cell_offset) * TAU)
 		_draw_rotated_cell_texture_at(
 			track_arrow_texture,
 			cell_center(cell) + direction_vector * travel * cell_size * 0.24,
 			arrow_rotation,
-			0.52,
+			lerpf(0.40, 0.60, force_ratio),
 			Color(0.78, 1.0, 1.0, alpha)
 		)
 	elif track_straight_texture == null and track_bend_texture == null:
 		_draw_cell_texture(_direction_texture(direction), cell, 0.62)
+	_draw_strength_badge(cell, strength, Color("299083"))
 
 
 func _draw_device(device: PlacedDevice) -> void:
@@ -319,7 +325,7 @@ func _draw_device(device: PlacedDevice) -> void:
 			if guiding_texture != null:
 				_draw_cell_texture(guiding_texture, device.cell, 0.92)
 				if _session.current_wind != null and _session.current_wind.has_wind(device.cell):
-					_draw_wind_track(device.cell, _session.current_wind.direction_at(device.cell))
+					_draw_wind_track(device.cell, _session.current_wind.direction_at(device.cell), _session.current_wind.strength_at(device.cell))
 			else:
 				var port_a := GameRules.vector(device.orientation)
 				var port_b := GameRules.vector(GameRules.clockwise(device.orientation))
@@ -415,6 +421,20 @@ func _draw_token(cell: Vector2i, label: String, color: Color) -> void:
 	draw_rect(Rect2(center - Vector2(27, 27), Vector2(54, 54)), color, true)
 	draw_rect(Rect2(center - Vector2(27, 27), Vector2(54, 54)), Color("40545a"), false, 2.0)
 	draw_string(ThemeDB.fallback_font, center + Vector2(-13, 8), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("20343b"))
+
+
+func _draw_strength_badge(cell: Vector2i, strength: int, color: Color) -> void:
+	if strength <= 0:
+		return
+	var radius := maxf(10.0, cell_size * 0.115)
+	var center := _cell_rect(cell).position + Vector2(cell_size - radius - 5.0, radius + 5.0)
+	draw_circle(center, radius, Color(1.0, 0.98, 0.91, 0.94))
+	draw_circle(center, radius, color, false, maxf(2.0, cell_size * 0.022))
+	var font_size := maxi(12, floori(cell_size * 0.14))
+	var font := ThemeDB.fallback_font
+	var text_rect := Rect2(center - Vector2(radius, radius), Vector2.ONE * radius * 2.0)
+	var baseline := text_rect.position.y + (text_rect.size.y + font.get_height(font_size)) * 0.5 - font.get_descent(font_size)
+	draw_string(font, Vector2(text_rect.position.x, baseline), str(strength), HORIZONTAL_ALIGNMENT_CENTER, text_rect.size.x, font_size, color)
 
 
 func _draw_arrow(center: Vector2, direction: int, color: Color, length := 34.0) -> void:
